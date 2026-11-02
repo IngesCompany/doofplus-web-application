@@ -3,6 +3,7 @@ import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/
 import {RouterLink} from '@angular/router';
 import {TranslatePipe} from '@ngx-translate/core';
 import {MatButton} from '@angular/material/button';
+import {MatCard, MatCardContent} from '@angular/material/card';
 import {MatIcon} from '@angular/material/icon';
 import {MatError, MatFormField} from '@angular/material/form-field';
 import {MatInput} from '@angular/material/input';
@@ -15,7 +16,7 @@ import {OrganizationsStore} from '../../../application/organizations.store';
  */
 @Component({
   selector: 'app-contact-us',
-  imports: [ReactiveFormsModule, RouterLink, TranslatePipe, MatButton, MatIcon, MatFormField, MatError, MatInput],
+  imports: [ReactiveFormsModule, RouterLink, TranslatePipe, MatButton, MatCard, MatCardContent, MatIcon, MatFormField, MatError, MatInput],
   templateUrl: './contact-us.html',
   styleUrl: './contact-us.css'
 })
@@ -25,12 +26,7 @@ export class ContactUs extends BaseForm implements OnInit {
   /**
    * Topics the team can help with, shown in the side panel.
    */
-  protected readonly topics = [
-    {key: 'plans', icon: 'payments'},
-    {key: 'environments', icon: 'dashboard'},
-    {key: 'compliance', icon: 'verified'},
-    {key: 'support', icon: 'support_agent'}
-  ];
+  protected readonly topics = ['plans', 'environments', 'compliance', 'support'];
 
   /**
    * Channels to reach the DoofPlus team.
