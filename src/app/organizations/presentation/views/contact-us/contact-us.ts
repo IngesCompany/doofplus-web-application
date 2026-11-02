@@ -38,7 +38,7 @@ export class ContactUs extends BaseForm implements OnInit {
   protected readonly channels = [
     {key: 'email', icon: 'mail', value: 'doofplus.inges@gmail.com', href: 'mailto:doofplus.inges@gmail.com'},
     {key: 'phone', icon: 'call', value: '+51 (1) 234-5678', href: 'tel:+5112345678'},
-    {key: 'location', icon: 'location_on', value: 'Lima, Peru', href: null}
+    {key: 'location', icon: 'location_on', value: 'Lima', href: null}
   ];
 
   /**
