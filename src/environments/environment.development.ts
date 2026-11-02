@@ -20,6 +20,7 @@ export const environment = {
   platformProviderFacilitiesEndpointPath: '/facilities',
   platformProviderUserProfilesEndpointPath: '/user-profiles',
   platformProviderAdministrativeActivitiesEndpointPath: '/administrative-activities',
+  platformProviderContactInquiriesEndpointPath: '/contact-inquiries',
   platformProviderPlansEndpointPath: '/plans',
   platformProviderSubscriptionsEndpointPath: '/subscriptions',
   platformProviderInvoicesEndpointPath: '/invoices',

@@ -1,0 +1,77 @@
+<section class="contact" aria-labelledby="contact-title">
+  <aside class="panel">
+    <h2>{{ 'organizations.contact.panel-title' | translate }}</h2>
+    <p>{{ 'organizations.contact.panel-text' | translate }}</p>
+    <ul class="topics">
+      @for (topic of topics; track topic.key) {
+        <li><mat-icon aria-hidden="true">{{ topic.icon }}</mat-icon>{{ 'organizations.contact.topics.' + topic.key | translate }}</li>
+      }
+    </ul>
+    <ul class="channels" [attr.aria-label]="'organizations.contact.channels-label' | translate">
+      @for (channel of channels; track channel.key) {
+        <li>
+          <mat-icon aria-hidden="true">{{ channel.icon }}</mat-icon>
+          <span>
+            <span class="channel-label">{{ 'organizations.contact.channels.' + channel.key | translate }}</span>
+            @if (channel.href) {
+              <a [href]="channel.href">{{ channel.value }}</a>
+            } @else {
+              <span>{{ channel.value }}</span>
+            }
+          </span>
+        </li>
+      }
+    </ul>
+  </aside>
+
+  <div class="content">
+    @if (store.contactStep() === 'sent') {
+      <div class="sent" role="status" aria-live="polite">
+        <span class="check"><mat-icon aria-hidden="true">mark_email_read</mat-icon></span>
+        <h1 id="contact-title">{{ 'organizations.contact.sent-title' | translate }}</h1>
+        <p class="muted">{{ 'organizations.contact.sent-text' | translate: {email: sentTo()} }}</p>
+        <div class="actions">
+          <button mat-flat-button type="button" (click)="sendAnother()">{{ 'organizations.contact.send-another' | translate }}</button>
+          <a mat-button routerLink="/sign-in">{{ 'organizations.contact.back-to-sign-in' | translate }}</a>
+        </div>
+      </div>
+    } @else {
+      <p class="overline">{{ 'organizations.contact.overline' | translate }}</p>
+      <h1 id="contact-title">{{ 'organizations.contact.title' | translate }}</h1>
+      <p class="muted lead">{{ 'organizations.contact.subtitle' | translate }}</p>
+
+      <form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate [attr.aria-busy]="store.loading()">
+        <label class="label" for="contact-full-name">{{ 'organizations.contact.full-name' | translate }} *</label>
+        <mat-form-field appearance="fill">
+          <input matInput id="contact-full-name" formControlName="fullName" autocomplete="name" aria-required="true"
+                 [attr.aria-invalid]="isInvalid('fullName')">
+          <mat-error>{{ 'organizations.contact.full-name-error' | translate }}</mat-error>
+        </mat-form-field>
+
+        <label class="label" for="contact-email">{{ 'organizations.contact.email' | translate }} *</label>
+        <mat-form-field appearance="fill">
+          <input matInput id="contact-email" type="email" formControlName="email" autocomplete="email" aria-required="true"
+                 [attr.aria-invalid]="isInvalid('email')">
+          <mat-error>{{ 'organizations.contact.email-error' | translate }}</mat-error>
+        </mat-form-field>
+
+        <label class="label" for="contact-message">{{ 'organizations.contact.message' | translate }} *</label>
+        <mat-form-field appearance="fill">
+          <textarea matInput id="contact-message" rows="5" formControlName="message" aria-required="true"
+                    [attr.aria-invalid]="isInvalid('message')"
+                    [placeholder]="'organizations.contact.message-placeholder' | translate"></textarea>
+          <mat-error>{{ 'organizations.contact.message-error' | translate }}</mat-error>
+        </mat-form-field>
+
+        @if (store.error()) {
+          <p class="field-error" role="alert"><mat-icon aria-hidden="true">warning</mat-icon>{{ 'organizations.contact.send-error' | translate }}</p>
+        }
+
+        <button mat-flat-button type="submit" class="send" [disabled]="store.loading()">
+          {{ (store.loading() ? 'organizations.contact.sending' : 'organizations.contact.send') | translate }}
+        </button>
+        <p class="privacy muted">{{ 'organizations.contact.privacy' | translate }}</p>
+      </form>
+    }
+  </div>
+</section>

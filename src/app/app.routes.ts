@@ -15,6 +15,7 @@ const iamAdministrationRoutes = () => import('./iam/presentation/iam.routes').th
 const monitoringRoutes = () => import('./monitoring/presentation/monitoring.routes').then((m) => m.monitoringRoutes);
 const subscriptionsRoutes = () => import('./subscriptions/presentation/subscriptions.routes').then(m => m.subscriptionsRoutes);
 const organizationsPublicRoutes = () => import('./organizations/presentation/organizations.routes').then(m => m.organizationsPublicRoutes);
+const organizationsContactRoutes = () => import('./organizations/presentation/organizations.routes').then(m => m.organizationsContactRoutes);
 const organizationsAdministrationRoutes = () => import('./organizations/presentation/organizations.routes').then(m => m.organizationsAdministrationRoutes);
 const profileRoutes = () => import('./organizations/presentation/organizations.routes').then(m => m.profileRoutes);
 const qualityRoutes = () => import('./quality/presentation/quality.routes').then(m => m.qualityRoutes);
@@ -33,6 +34,7 @@ export const routes: Routes = [
   { path: '', redirectTo: '/sign-in', pathMatch: 'full' },
   { path: 'sign-in', loadComponent: layout, loadChildren: iamRoutes },
   { path: 'register', loadChildren: organizationsPublicRoutes },
+  { path: 'contact', loadComponent: layout, loadChildren: organizationsContactRoutes },
   {
     path: 'qa',
     loadComponent: workspaceShell,

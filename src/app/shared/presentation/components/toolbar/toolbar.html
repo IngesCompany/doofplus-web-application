@@ -6,5 +6,8 @@
     <a routerLink="/sign-in" class="back"><mat-icon>arrow_back</mat-icon>{{ 'shell.all-environments' | translate }}</a>
   }
   <span class="spacer"></span>
+  <a routerLink="/contact" class="contact" [attr.aria-label]="'shell.contact-us' | translate">
+    <mat-icon aria-hidden="true">mail</mat-icon><span class="contact-text">{{ 'shell.contact-us' | translate }}</span>
+  </a>
   <app-language-switcher/>
 </mat-toolbar>
