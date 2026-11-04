@@ -42,21 +42,21 @@
 
       <form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate [attr.aria-busy]="store.loading()">
         <label class="label" for="contact-full-name">{{ 'organizations.contact.full-name' | translate }} *</label>
-        <mat-form-field appearance="fill">
+        <mat-form-field appearance="outline">
           <input matInput id="contact-full-name" formControlName="fullName" autocomplete="name" aria-required="true"
                  [attr.aria-invalid]="isInvalid('fullName')">
           <mat-error>{{ 'organizations.contact.full-name-error' | translate }}</mat-error>
         </mat-form-field>
 
         <label class="label" for="contact-email">{{ 'organizations.contact.email' | translate }} *</label>
-        <mat-form-field appearance="fill">
+        <mat-form-field appearance="outline">
           <input matInput id="contact-email" type="email" formControlName="email" autocomplete="email" aria-required="true"
                  [attr.aria-invalid]="isInvalid('email')">
           <mat-error>{{ 'organizations.contact.email-error' | translate }}</mat-error>
         </mat-form-field>
 
         <label class="label" for="contact-message">{{ 'organizations.contact.message' | translate }} *</label>
-        <mat-form-field appearance="fill">
+        <mat-form-field appearance="outline">
           <textarea matInput id="contact-message" rows="5" formControlName="message" aria-required="true"
                     [attr.aria-invalid]="isInvalid('message')"
                     [placeholder]="'organizations.contact.message-placeholder' | translate"></textarea>
