@@ -1,4 +1,4 @@
-﻿# Contributing to IngesCompany-Frontend
+﻿# Contributing to doofplus-web-application
 
 First off, thanks for taking the time to contribute!
 
