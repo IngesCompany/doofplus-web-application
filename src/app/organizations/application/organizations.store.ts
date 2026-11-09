@@ -6,6 +6,7 @@ import {Facility} from '../domain/model/facility.entity';
 import {UserProfile} from '../domain/model/user-profile.entity';
 import {AdministrativeActivity} from '../domain/model/administrative-activity.entity';
 import {RegisterOrganizationCommand} from '../domain/model/register-organization.command';
+import {ContactInquiry} from '../domain/model/contact-inquiry.entity';
 import {IamStore} from '../../iam/application/iam.store';
 import {SubscriptionsStore} from '../../subscriptions/application/subscriptions.store';
 
@@ -13,6 +14,11 @@ import {SubscriptionsStore} from '../../subscriptions/application/subscriptions.
  * Step of the organization registration shown by the registration form.
  */
 export type RegistrationStep = 'form' | 'ruc-registered' | 'verification';
+
+/**
+ * Step of the public contact us page.
+ */
+export type ContactStep = 'form' | 'sent';
 
 /**
  * Holds the organization of the signed-in user, its facilities, the user profiles and the registration flow.
@@ -28,6 +34,7 @@ export class OrganizationsStore {
   private readonly profilesSignal = signal<UserProfile[]>([]);
   private readonly activitiesSignal = signal<AdministrativeActivity[]>([]);
   private readonly registrationStepSignal = signal<RegistrationStep>('form');
+  private readonly contactStepSignal = signal<ContactStep>('form');
   private readonly loadingSignal = signal<boolean>(false);
   private readonly errorSignal = signal<string | null>(null);
 
@@ -56,6 +63,11 @@ export class OrganizationsStore {
    * Current step of the registration.
    */
   readonly registrationStep = this.registrationStepSignal.asReadonly();
+
+  /**
+   * Current step of the contact us page.
+   */
+  readonly contactStep = this.contactStepSignal.asReadonly();
 
   /**
    * Whether data is loading.
@@ -141,6 +153,33 @@ export class OrganizationsStore {
    * Returns the registration to the form.
    */
   resetRegistration = (): void => this.registrationStepSignal.set('form');
+
+  /**
+   * Registers a question sent from the public contact us page with the received status.
+   * @param inquiry - Name, email and question entered by the visitor.
+   */
+  sendContactInquiry = (inquiry: { fullName: string; email: string; message: string }): void => {
+    this.loadingSignal.set(true);
+    this.errorSignal.set(null);
+    this.organizationsApi.createContactInquiry(new ContactInquiry({
+      id: 0, fullName: inquiry.fullName.trim(), email: inquiry.email.trim(), message: inquiry.message.trim(),
+      status: 'received', receivedAt: new Date().toISOString()
+    })).subscribe({
+      next: () => {
+        this.loadingSignal.set(false);
+        this.contactStepSignal.set('sent');
+      },
+      error: err => {
+        this.errorSignal.set(this.formatError(err, 'Failed to send the inquiry'));
+        this.loadingSignal.set(false);
+      }
+    });
+  };
+
+  /**
+   * Returns the contact us page to the form.
+   */
+  resetContact = (): void => this.contactStepSignal.set('form');
 
   /**
    * Creates the organization and the records that depend on it.

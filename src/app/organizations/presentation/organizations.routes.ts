@@ -1,7 +1,10 @@
 import {Routes} from '@angular/router';
+import {unsavedChangesGuard} from '../../shared/presentation/guards/unsaved-changes.guard';
 
 const organizationRegistration = () =>
   import('./views/organization-registration/organization-registration').then(m => m.OrganizationRegistration);
+const contactUs = () =>
+  import('./views/contact-us/contact-us').then(m => m.ContactUs);
 const administrationOverview = () =>
   import('./views/administration-overview/administration-overview').then(m => m.AdministrationOverview);
 const profilePreferences = () =>
@@ -11,7 +14,17 @@ const profilePreferences = () =>
  * Public route of the organization registration.
  */
 export const organizationsPublicRoutes: Routes = [
-  { path: '', loadComponent: organizationRegistration, title: 'DoofPlus - Organization registration' }
+  {
+    path: '', loadComponent: organizationRegistration, canDeactivate: [unsavedChangesGuard],
+    title: 'DoofPlus - Organization registration'
+  }
+];
+
+/**
+ * Public contact us route, shown with the public toolbar and footer.
+ */
+export const organizationsContactRoutes: Routes = [
+  { path: '', loadComponent: contactUs, title: 'DoofPlus - Contact us' }
 ];
 
 /**

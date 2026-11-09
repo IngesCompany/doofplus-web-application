@@ -7,14 +7,16 @@ import {Organization} from '../domain/model/organization.entity';
 import {Facility} from '../domain/model/facility.entity';
 import {UserProfile} from '../domain/model/user-profile.entity';
 import {AdministrativeActivity} from '../domain/model/administrative-activity.entity';
+import {ContactInquiry} from '../domain/model/contact-inquiry.entity';
 import {OrganizationsApiEndpoint} from './organizations-api-endpoint';
 import {FacilitiesApiEndpoint} from './facilities-api-endpoint';
 import {UserProfilesApiEndpoint} from './user-profiles-api-endpoint';
 import {AdministrativeActivitiesApiEndpoint} from './administrative-activities-api-endpoint';
+import {ContactInquiriesApiEndpoint} from './contact-inquiries-api-endpoint';
 import {OrganizationResource} from './organizations-response';
 
 /**
- * Infrastructure facade for organizations, facilities, user profiles and administrative activity.
+ * Infrastructure facade for organizations, facilities, user profiles, administrative activity and contact inquiries.
  */
 @Injectable({providedIn: 'root'})
 export class OrganizationsApi extends BaseApi {
@@ -23,6 +25,7 @@ export class OrganizationsApi extends BaseApi {
   private readonly facilitiesEndpoint = new FacilitiesApiEndpoint(this.http);
   private readonly userProfilesEndpoint = new UserProfilesApiEndpoint(this.http);
   private readonly activitiesEndpoint = new AdministrativeActivitiesApiEndpoint(this.http);
+  private readonly contactInquiriesEndpoint = new ContactInquiriesApiEndpoint(this.http);
   private readonly organizationsUrl =
     `${environment.platformProviderApiBaseUrl}${environment.platformProviderOrganizationsEndpointPath}`;
 
@@ -79,4 +82,11 @@ export class OrganizationsApi extends BaseApi {
    * @returns Stream with the activity collection.
    */
   getActivities = (): Observable<AdministrativeActivity[]> => this.activitiesEndpoint.getAll();
+
+  /**
+   * Registers a contact inquiry sent from the public contact us page.
+   * @param inquiry - The inquiry to register.
+   * @returns Stream with the registered inquiry.
+   */
+  createContactInquiry = (inquiry: ContactInquiry): Observable<ContactInquiry> => this.contactInquiriesEndpoint.create(inquiry);
 }

@@ -16,7 +16,7 @@
            [activated]="link.isActive">{{ option.label | translate }}</a>
       }
     </mat-nav-list>
-    <a class="help" [href]="landingUrl" target="_blank" rel="noopener">
+    <a class="help" [href]="landingUrl + '#faq'" target="_blank" rel="noopener">
       {{ 'shell.help' | translate }}<mat-icon>open_in_new</mat-icon>
     </a>
   </mat-sidenav>
@@ -28,10 +28,13 @@
           <mat-icon>menu</mat-icon>
         </button>
       }
-      <label class="search">
-        <mat-icon>search</mat-icon>
-        <input type="search" [placeholder]="'shell.search' | translate" [attr.aria-label]="'shell.search' | translate">
-      </label>
+      @if (searchTargets.length) {
+        <form class="search" role="search" (submit)="$event.preventDefault(); search(searchInput)">
+          <mat-icon>search</mat-icon>
+          <input #searchInput type="search" [placeholder]="'shell.search-' + environment | translate"
+                 [attr.aria-label]="'shell.search-' + environment | translate">
+        </form>
+      }
       <span class="spacer"></span>
       <app-language-switcher variant="dark"/>
       @if (user(); as current) {
@@ -63,8 +66,8 @@
         <p>{{ current.organizationName }} · {{ current.plant }} · {{ today() }} · {{ 'shell.utc' | translate }} · {{ 'shell.role-based' | translate }}</p>
       }
       <nav [attr.aria-label]="'shell.legal' | translate">
-        <a [href]="landingUrl + 'terms.html'">{{ 'footer.terms' | translate }}</a>
-        <a [href]="landingUrl + 'privacy.html'">{{ 'footer.privacy' | translate }}</a>
+        <a [href]="landingUrl + 'terms.html'" target="_blank" rel="noopener">{{ 'footer.terms' | translate }}</a>
+        <a [href]="landingUrl + 'privacy.html'" target="_blank" rel="noopener">{{ 'footer.privacy' | translate }}</a>
       </nav>
     </footer>
   </mat-sidenav-content>

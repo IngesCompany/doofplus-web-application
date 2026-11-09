@@ -18,6 +18,12 @@
       "locked": "Aprobada · bloqueada",
       "draft": "Borrador"
     },
+    "dosage-forms": {
+      "tablet": "Tableta",
+      "capsule": "Cápsula",
+      "syrup": "Jarabe",
+      "injectable": "Inyectable"
+    },
     "batch-status": {
       "planned": "Planificado",
       "in-progress": "En curso",
@@ -224,10 +230,15 @@
   },
   "shell": {
     "back-to-doofplus": "Volver a DoofPlus",
+    "all-environments": "Todos los entornos",
+    "back-to-sign-in": "Volver al inicio de sesión",
     "workspace": "Espacio de trabajo",
     "help": "Ayuda y documentación",
     "menu": "Abrir menú",
-    "search": "Buscar lotes, documentos, personas",
+    "search-qa": "Buscar por código de documento o de lote",
+    "search-production": "Buscar por código de lote, orden o sensor",
+    "search-empty": "No hay registros con el código {{code}}. Ingresa el código exacto, por ejemplo {{example}}.",
+    "close": "Cerrar",
     "profile": "Perfil y preferencias",
     "sign-out": "Cerrar sesión",
     "utc": "Horas en UTC",
@@ -239,7 +250,8 @@
     "user-menu": "Menú de usuario",
     "legal": "Información legal",
     "cancel": "Cancelar",
-    "status": "Estado"
+    "status": "Estado",
+    "contact-us": "Contáctanos"
   },
   "nav": {
     "quality-overview": "Resumen de calidad",
@@ -378,6 +390,7 @@
     },
     "registration": {
       "headline": "Claridad en cada paso crítico.",
+      "leave-confirm": "¿Salir del registro? Se perderán los datos ingresados.",
       "intro": {
         "qa-title": "Espacio QA/QC",
         "qa-text": "Documentos, desviaciones, CAPA y decisiones de liberación.",
@@ -474,6 +487,40 @@
       "access-review-text": "{{count}} usuarios por revisar",
       "review-access": "Revisar accesos",
       "activity": "Actividad administrativa"
+    },
+    "contact": {
+      "overline": "Contáctanos",
+      "title": "Envíanos tu consulta",
+      "subtitle": "Cuéntanos sobre tu laboratorio y lo que necesitas. El equipo de DoofPlus te responde por correo.",
+      "panel-title": "Habla con el equipo de DoofPlus",
+      "panel-text": "¿Dudas sobre los planes, los entornos de cada rol o cómo DoofPlus apoya el cumplimiento de DIGEMID y BPM? Estamos para ayudarte.",
+      "topics": {
+        "plans": "Planes y precios para tu laboratorio",
+        "environments": "Entornos de Calidad, Producción y Administración para tus equipos",
+        "compliance": "Cumplimiento de DIGEMID y BPM",
+        "support": "Soporte técnico e incorporación"
+      },
+      "channels": {
+        "email": "Correo",
+        "phone": "Teléfono",
+        "location": "Oficina"
+      },
+      "channels-label": "Canales de contacto",
+      "full-name": "Nombre completo",
+      "full-name-error": "Ingresa tu nombre completo.",
+      "email": "Correo de trabajo",
+      "email-error": "Ingresa un correo válido.",
+      "message": "Tu consulta",
+      "message-placeholder": "¿Cómo podemos ayudar a tu laboratorio?",
+      "message-error": "Escribe tu consulta.",
+      "send": "Enviar consulta",
+      "sending": "Enviando…",
+      "privacy": "Solo usamos tus datos para responder esta consulta.",
+      "send-error": "No pudimos enviar tu consulta. Inténtalo de nuevo en unos minutos.",
+      "sent-title": "Consulta recibida",
+      "sent-text": "Gracias. Registramos tu consulta y te responderemos a {{email}}.",
+      "send-another": "Enviar otra consulta",
+      "back-to-sign-in": "Volver al inicio de sesión"
     }
   },
   "monitoring": {
@@ -645,8 +692,7 @@
       "subtitle": "Elige el entorno en el que trabajas. Cada entorno muestra los módulos y aprobaciones de su rol.",
       "new-laboratory": "¿Laboratorio nuevo?",
       "register": "Registra tu organización",
-      "not-customer": "¿Aún no eres cliente?",
-      "see-plans": "Ver planes"
+      "questions": "¿Dudas sobre DoofPlus?"
     },
     "sign-in": {
       "title": "Inicia sesión en el entorno {{environment}}",
@@ -713,7 +759,24 @@
       "rbac": "Control de acceso por rol",
       "rbac-text": "Solo los usuarios autenticados con rol y sede asignados acceden a las funciones. Elegir un segmento público nunca da acceso.",
       "sent-title": "Invitación enviada.",
-      "sent-text": "{{email}} aparece en Invitaciones hasta que verifique su correo y active el 2FA."
+      "sent-text": "{{email}} aparece en Invitaciones hasta que verifique su correo y active el 2FA.",
+      "permissions": {
+        "documents": "Documentos",
+        "capa": "CAPA",
+        "orders": "Órdenes",
+        "incidents": "Incidentes",
+        "users": "Usuarios",
+        "plans": "Planes",
+        "release-if-authorized": "Liberación si está autorizado",
+        "production-records": "Registros de producción",
+        "approve-documents-and-capa": "Aprobar documentos y CAPA",
+        "none": "Ninguno",
+        "no-billing-access": "Sin acceso a facturación",
+        "cannot-release-batch": "No puede liberar lotes",
+        "cannot-approve-own-records": "No puede aprobar sus propios registros",
+        "read-only-evidence": "Solo lectura de evidencias",
+        "no-qa-release-or-signing": "Sin firma ni liberación de QA"
+      }
     },
     "invite": {
       "title": "Invitar usuario",

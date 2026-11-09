@@ -20,6 +20,7 @@ export const environment = {
   platformProviderFacilitiesEndpointPath: '/facilities',
   platformProviderUserProfilesEndpointPath: '/user-profiles',
   platformProviderAdministrativeActivitiesEndpointPath: '/administrative-activities',
+  platformProviderContactInquiriesEndpointPath: '/contact-inquiries',
   platformProviderPlansEndpointPath: '/plans',
   platformProviderSubscriptionsEndpointPath: '/subscriptions',
   platformProviderInvoicesEndpointPath: '/invoices',
@@ -38,5 +39,5 @@ export const environment = {
   platformProviderSensorsEndpointPath: '/sensors',
   platformProviderReadingsEndpointPath: '/readings',
   platformProviderAlertsEndpointPath: '/alerts',
-  landingPageUrl: 'https://ingescompany-7742.github.io/IngesCompany-LandingPage/',
+  landingPageUrl: 'http://localhost:8080/',
 };
