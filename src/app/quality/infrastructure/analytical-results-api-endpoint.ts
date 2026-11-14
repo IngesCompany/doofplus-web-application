@@ -14,6 +14,6 @@ export class AnalyticalResultsApiEndpoint extends BaseApiEndpoint<AnalyticalResu
    * @param http - The HttpClient to be used for making API requests.
    */
   constructor(http: HttpClient) {
-    super(http, `${environment.platformProviderApiBaseUrl}${environment.platformProviderAnalyticalResultsEndpointPath}`, new AnalyticalResultAssembler());
+    super(http, `${environment.fakeApiBaseUrl}${environment.platformProviderAnalyticalResultsEndpointPath}`, new AnalyticalResultAssembler());
   }
 }

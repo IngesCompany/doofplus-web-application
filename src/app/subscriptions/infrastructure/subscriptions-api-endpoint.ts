@@ -14,6 +14,6 @@ export class SubscriptionsApiEndpoint extends BaseApiEndpoint<Subscription, Subs
    * @param http - The HttpClient to be used for making API requests.
    */
   constructor(http: HttpClient) {
-    super(http, `${environment.platformProviderApiBaseUrl}${environment.platformProviderSubscriptionsEndpointPath}`, new SubscriptionAssembler());
+    super(http, `${environment.fakeApiBaseUrl}${environment.platformProviderSubscriptionsEndpointPath}`, new SubscriptionAssembler());
   }
 }

@@ -14,6 +14,6 @@ export class MaterialLotsApiEndpoint extends BaseApiEndpoint<MaterialLot, Materi
    * @param http - The HttpClient to be used for making API requests.
    */
   constructor(http: HttpClient) {
-    super(http, `${environment.platformProviderApiBaseUrl}${environment.platformProviderMaterialLotsEndpointPath}`, new MaterialLotAssembler());
+    super(http, `${environment.fakeApiBaseUrl}${environment.platformProviderMaterialLotsEndpointPath}`, new MaterialLotAssembler());
   }
 }

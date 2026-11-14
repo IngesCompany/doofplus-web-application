@@ -14,6 +14,6 @@ export class RegulatoryReportsApiEndpoint extends BaseApiEndpoint<RegulatoryRepo
    * @param http - The HttpClient to be used for making API requests.
    */
   constructor(http: HttpClient) {
-    super(http, `${environment.platformProviderApiBaseUrl}${environment.platformProviderRegulatoryReportsEndpointPath}`, new RegulatoryReportAssembler());
+    super(http, `${environment.fakeApiBaseUrl}${environment.platformProviderRegulatoryReportsEndpointPath}`, new RegulatoryReportAssembler());
   }
 }

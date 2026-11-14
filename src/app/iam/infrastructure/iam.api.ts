@@ -22,7 +22,7 @@ export class IamApi extends BaseApi {
   private readonly usersEndpoint = new UsersApiEndpoint(this.http);
   private readonly roleProfilesEndpoint = new RoleProfilesApiEndpoint(this.http);
   private readonly invitationsEndpoint = new InvitationsApiEndpoint(this.http);
-  private readonly usersUrl = `${environment.platformProviderApiBaseUrl}${environment.platformProviderUsersEndpointPath}`;
+  private readonly usersUrl = `${environment.fakeApiBaseUrl}${environment.platformProviderUsersEndpointPath}`;
   private readonly userAssembler = new UserAssembler();
 
   /**

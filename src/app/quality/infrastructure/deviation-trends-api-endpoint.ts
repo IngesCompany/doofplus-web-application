@@ -14,6 +14,6 @@ export class DeviationTrendsApiEndpoint extends BaseApiEndpoint<DeviationTrend, 
    * @param http - The HttpClient to be used for making API requests.
    */
   constructor(http: HttpClient) {
-    super(http, `${environment.platformProviderApiBaseUrl}${environment.platformProviderDeviationTrendsEndpointPath}`, new DeviationTrendAssembler());
+    super(http, `${environment.fakeApiBaseUrl}${environment.platformProviderDeviationTrendsEndpointPath}`, new DeviationTrendAssembler());
   }
 }

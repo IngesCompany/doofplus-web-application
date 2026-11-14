@@ -14,6 +14,6 @@ export class ProductionOrdersApiEndpoint extends BaseApiEndpoint<ProductionOrder
    * @param http - The HttpClient to be used for making API requests.
    */
   constructor(http: HttpClient) {
-    super(http, `${environment.platformProviderApiBaseUrl}${environment.platformProviderProductionOrdersEndpointPath}`, new ProductionOrderAssembler());
+    super(http, `${environment.fakeApiBaseUrl}${environment.platformProviderProductionOrdersEndpointPath}`, new ProductionOrderAssembler());
   }
 }

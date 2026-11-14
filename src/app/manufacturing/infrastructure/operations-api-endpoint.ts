@@ -14,6 +14,6 @@ export class OperationsApiEndpoint extends BaseApiEndpoint<Operation, OperationR
    * @param http - The HttpClient to be used for making API requests.
    */
   constructor(http: HttpClient) {
-    super(http, `${environment.platformProviderApiBaseUrl}${environment.platformProviderOperationsEndpointPath}`, new OperationAssembler());
+    super(http, `${environment.fakeApiBaseUrl}${environment.platformProviderOperationsEndpointPath}`, new OperationAssembler());
   }
 }
