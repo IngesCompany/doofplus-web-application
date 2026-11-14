@@ -55,6 +55,16 @@ export interface UserResource extends BaseResource {
 }
 
 /**
+ * Resource answered by the sign-in of the DoofPlus Platform: the user and its JWT.
+ */
+export interface AuthenticatedUserResource extends UserResource {
+  /**
+   * JWT to send as Authorization: Bearer in the requests to the DoofPlus Platform.
+   */
+  token: string;
+}
+
+/**
  * Response envelope for user collection queries.
  */
 export interface UsersResponse extends BaseResponse {
