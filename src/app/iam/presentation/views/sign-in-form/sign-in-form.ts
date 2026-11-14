@@ -100,7 +100,7 @@ export class SignInForm extends BaseForm implements OnInit {
       return;
     }
     const {email, password} = this.form.getRawValue();
-    this.store.signIn(new SignInCommand({email: email.trim(), password, environment: this.selected()}));
+    this.store.signIn(new SignInCommand({email: email.trim(), password, environment: this.selected()}), this.router);
   };
 
   /**
