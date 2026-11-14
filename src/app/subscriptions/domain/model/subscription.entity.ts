@@ -1,4 +1,5 @@
 import {BaseEntity} from '../../../shared/domain/model/base-entity';
+import {Invoice} from './invoice.entity';
 
 /**
  * Represents the subscription of an organization to a plan, paid through Niubiz.
@@ -18,6 +19,16 @@ export class Subscription implements BaseEntity {
    * Key of the subscribed plan.
    */
   #planKey: string;
+
+  /**
+   * Identifier of the plan in the DoofPlus Platform.
+   */
+  #planId: number;
+
+  /**
+   * Invoices of the subscription: its payments.
+   */
+  #invoices: Invoice[];
 
   /**
    * Billing cycle (monthly or annual).
@@ -68,10 +79,12 @@ export class Subscription implements BaseEntity {
    * Creates a new subscription.
    * @param subscription - Initial values of the subscription.
    */
-  constructor(subscription: { id: number; organizationId: number; planKey: string; billingCycle: string; status: string; paymentState: string; nextInvoiceDate: string; autoRenew: boolean; cardBrand: string; cardLast4: string; cardExpiry: string; billingEmail: string }) {
+  constructor(subscription: { id: number; organizationId: number; planId: number; planKey: string; invoices: Invoice[]; billingCycle: string; status: string; paymentState: string; nextInvoiceDate: string; autoRenew: boolean; cardBrand: string; cardLast4: string; cardExpiry: string; billingEmail: string }) {
     this.#id = subscription.id;
     this.#organizationId = subscription.organizationId;
     this.#planKey = subscription.planKey;
+    this.#planId = subscription.planId;
+    this.#invoices = subscription.invoices;
     this.#billingCycle = subscription.billingCycle;
     this.#status = subscription.status;
     this.#paymentState = subscription.paymentState;
@@ -89,6 +102,9 @@ export class Subscription implements BaseEntity {
   get organizationId(): number { return this.#organizationId; }
   set organizationId(value: number) { this.#organizationId = value; }
 
+  get planId(): number { return this.#planId; }
+  set planId(value: number) { this.#planId = value; }
+  get invoices(): Invoice[] { return this.#invoices; }
   get planKey(): string { return this.#planKey; }
   set planKey(value: string) { this.#planKey = value; }
 

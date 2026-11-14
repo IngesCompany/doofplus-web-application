@@ -11,7 +11,11 @@ export interface PlanResource extends BaseResource {
   /**
    * Plan key (standard-lab or enterprise).
    */
-  key: string;
+  planKey: string;
+  /**
+   * ISO 4217 currency of the prices.
+   */
+  currency: string;
   /**
    * Display name of the plan.
    */

@@ -35,6 +35,13 @@
       </mat-card>
     </div>
 
+    @if (store.error(); as error) {
+      <div class="alert alert-danger" role="alert">
+        <mat-icon>error</mat-icon>
+        <p>{{ error }}</p>
+      </div>
+    }
+
     @if (subscription.paymentState === 'declined') {
       <div class="alert alert-danger declined-alert" role="alert">
         <mat-icon>warning</mat-icon>

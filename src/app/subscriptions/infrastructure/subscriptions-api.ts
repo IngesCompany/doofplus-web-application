@@ -4,58 +4,35 @@ import {Observable} from 'rxjs';
 import {BaseApi} from '../../shared/infrastructure/base-api';
 import {Plan} from '../domain/model/plan.entity';
 import {Subscription} from '../domain/model/subscription.entity';
-import {Invoice} from '../domain/model/invoice.entity';
 import {PlansApiEndpoint} from './plans-api-endpoint';
 import {SubscriptionsApiEndpoint} from './subscriptions-api-endpoint';
-import {InvoicesApiEndpoint} from './invoices-api-endpoint';
+import {CreateSubscriptionRequest} from './subscriptions-response';
 
 /**
- * Infrastructure facade for plans, subscriptions and invoices.
+ * Facade of the Subscriptions bounded context over the DoofPlus Platform.
  */
 @Injectable({providedIn: 'root'})
 export class SubscriptionsApi extends BaseApi {
   private readonly http = inject(HttpClient);
   private readonly plansEndpoint = new PlansApiEndpoint(this.http);
   private readonly subscriptionsEndpoint = new SubscriptionsApiEndpoint(this.http);
-  private readonly invoicesEndpoint = new InvoicesApiEndpoint(this.http);
 
-  /**
-   * Retrieves the plans offered by DoofPlus.
-   * @returns Stream with the plan collection.
-   */
+  /** Gets the plans. */
   getPlans = (): Observable<Plan[]> => this.plansEndpoint.getAll();
 
-  /**
-   * Retrieves all subscriptions.
-   * @returns Stream with the subscription collection.
-   */
-  getSubscriptions = (): Observable<Subscription[]> => this.subscriptionsEndpoint.getAll();
+  /** Gets the subscriptions of an organization. */
+  getSubscriptionsByOrganization = (organizationId: number): Observable<Subscription[]> =>
+    this.subscriptionsEndpoint.getByOrganization(organizationId);
 
-  /**
-   * Creates a subscription.
-   * @param subscription - The subscription to create.
-   * @returns Stream with the created subscription.
-   */
-  createSubscription = (subscription: Subscription): Observable<Subscription> => this.subscriptionsEndpoint.create(subscription);
+  /** Creates a pending subscription. */
+  createSubscription = (request: CreateSubscriptionRequest): Observable<Subscription> =>
+    this.subscriptionsEndpoint.createForOrganization(request);
 
-  /**
-   * Updates a subscription.
-   * @param subscription - The subscription to update.
-   * @returns Stream with the updated subscription.
-   */
-  updateSubscription = (subscription: Subscription): Observable<Subscription> =>
-    this.subscriptionsEndpoint.update(subscription, subscription.id);
+  /** Changes the plan and the billing cycle of a subscription. */
+  changePlan = (id: number, planId: number, billingCycle: string): Observable<Subscription> =>
+    this.subscriptionsEndpoint.changePlan(id, planId, billingCycle);
 
-  /**
-   * Retrieves all invoices.
-   * @returns Stream with the invoice collection.
-   */
-  getInvoices = (): Observable<Invoice[]> => this.invoicesEndpoint.getAll();
-
-  /**
-   * Creates an invoice.
-   * @param invoice - The invoice to create.
-   * @returns Stream with the created invoice.
-   */
-  createInvoice = (invoice: Invoice): Observable<Invoice> => this.invoicesEndpoint.create(invoice);
+  /** Pays the next billing period with Niubiz. */
+  paySubscription = (id: number, cardToken: string): Observable<Subscription> =>
+    this.subscriptionsEndpoint.pay(id, cardToken);
 }
