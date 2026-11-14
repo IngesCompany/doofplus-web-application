@@ -22,7 +22,7 @@ export class PlanAssembler implements BaseAssembler<Plan, PlanResource, PlansRes
   toEntityFromResource = (resource: PlanResource): Plan =>
     new Plan({
       id: resource.id,
-      key: resource.key,
+      key: resource.planKey,
       name: resource.name,
       monthlyPrice: resource.monthlyPrice,
       annualPrice: resource.annualPrice,
@@ -38,7 +38,7 @@ export class PlanAssembler implements BaseAssembler<Plan, PlanResource, PlansRes
   toResourceFromEntity = (entity: Plan): PlanResource =>
     ({
       id: entity.id,
-      key: entity.key,
+      planKey: entity.key,
       name: entity.name,
       monthlyPrice: entity.monthlyPrice,
       annualPrice: entity.annualPrice,

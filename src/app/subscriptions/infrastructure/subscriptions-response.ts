@@ -1,65 +1,74 @@
 import {BaseResource, BaseResponse} from '../../shared/infrastructure/base-response';
 
 /**
- * Resource representation of a subscription.
+ * Resource representation of a payment of a subscription, shown as an invoice.
+ */
+export interface PaymentResource {
+  /** Unique identifier of the payment. */
+  id: number;
+  /** Invoice number, for example INV-1-1. */
+  invoiceNumber: string;
+  /** Amount charged. */
+  amount: number;
+  /** ISO 4217 currency. */
+  currency: string;
+  /** Transaction identifier returned by Niubiz. */
+  gatewayTransactionId: string | null;
+  /** PENDING, APPROVED or REJECTED. */
+  status: string;
+  /** Date and time when the gateway processed the payment. */
+  processedAt: string | null;
+}
+
+/**
+ * Resource representation of a subscription, as the DoofPlus Platform sends it.
  */
 export interface SubscriptionResource extends BaseResource {
-  /**
-   * Unique identifier of the subscription.
-   */
+  /** Unique identifier of the subscription. */
   id: number;
-  /**
-   * Identifier of the subscribed organization.
-   */
+  /** Identifier of the subscribed organization. */
   organizationId: number;
-  /**
-   * Key of the subscribed plan.
-   */
-  planKey: string;
-  /**
-   * Billing cycle (monthly or annual).
-   */
+  /** Identifier of the plan. */
+  planId: number;
+  /** MONTHLY or ANNUAL. */
   billingCycle: string;
-  /**
-   * Status of the subscription (active or pending).
-   */
+  /** PENDING, ACTIVE or CANCELLED. */
   status: string;
-  /**
-   * State of the last charge (approved or declined).
-   */
-  paymentState: string;
-  /**
-   * Date of the next invoice (ISO 8601).
-   */
-  nextInvoiceDate: string;
-  /**
-   * Whether the subscription renews automatically.
-   */
+  /** Whether the subscription renews automatically. */
   autoRenew: boolean;
-  /**
-   * Brand of the card on file.
-   */
+  /** Card brand. */
   cardBrand: string;
-  /**
-   * Last four digits of the card on file.
-   */
+  /** Last four digits of the card. */
   cardLast4: string;
-  /**
-   * Expiry date of the card (MM/YYYY).
-   */
+  /** Card expiry (MM/YYYY). */
   cardExpiry: string;
-  /**
-   * Email that receives invoices and renewal reminders.
-   */
+  /** Email that receives the invoices. */
+  billingEmail: string;
+  /** Start of the paid period, or null while pending. */
+  currentPeriodStart: string | null;
+  /** End of the paid period, or null while pending. */
+  currentPeriodEnd: string | null;
+  /** Payments of the subscription. */
+  payments: PaymentResource[];
+}
+
+/**
+ * Request sent to create a subscription.
+ */
+export interface CreateSubscriptionRequest {
+  organizationId: number;
+  planId: number;
+  billingCycle: string;
+  cardBrand: string;
+  cardLast4: string;
+  cardExpiry: string;
   billingEmail: string;
 }
 
 /**
- * Response envelope for subscription collection queries.
+ * Response wrapper for a subscriptions collection.
  */
 export interface SubscriptionsResponse extends BaseResponse {
-  /**
-   * Array of subscription resources included in the response.
-   */
+  /** Subscription records returned by the API. */
   subscriptions: SubscriptionResource[];
 }

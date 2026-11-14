@@ -1,5 +1,4 @@
 import {computed, inject, Injectable, signal} from '@angular/core';
-import {retry} from 'rxjs';
 import {SubscriptionsApi} from '../infrastructure/subscriptions-api';
 import {Plan} from '../domain/model/plan.entity';
 import {Subscription} from '../domain/model/subscription.entity';
@@ -36,7 +35,7 @@ export class SubscriptionsStore {
   /**
    * Plan of the subscription.
    */
-  readonly currentPlan = computed(() => this.plans().find(plan => plan.key === this.subscription()?.planKey));
+  readonly currentPlan = computed(() => this.plans().find(plan => plan.id === this.subscription()?.planId));
 
   /**
    * Amount charged per billing cycle.
@@ -62,27 +61,27 @@ export class SubscriptionsStore {
    */
   constructor() {
     this.subscriptionsApi.getPlans().subscribe({
-      next: plans => this.plansSignal.set(plans),
+      next: plans => {
+        this.plansSignal.set(plans);
+        const subscription = this.subscriptionSignal();
+        if (subscription) this.setSubscription(subscription);
+      },
       error: err => this.errorSignal.set(this.formatError(err, 'Failed to load plans'))
     });
   }
 
   /**
-   * Loads the subscription of an organization and its invoices.
+   * Loads the subscription of an organization; its invoices come with it.
    * @param organizationId - Identifier of the organization.
    */
   loadForOrganization = (organizationId: number): void => {
     this.loadingSignal.set(true);
-    this.subscriptionsApi.getSubscriptions().subscribe({
+    this.subscriptionsApi.getSubscriptionsByOrganization(organizationId).subscribe({
       next: subscriptions => {
-        const subscription = subscriptions.find(item => item.organizationId === organizationId) ?? null;
-        this.subscriptionSignal.set(subscription);
+        const current = subscriptions.find(item => item.status === 'pending' || item.status === 'active')
+          ?? subscriptions[0] ?? null;
+        this.setSubscription(current);
         this.loadingSignal.set(false);
-        if (!subscription) return;
-        this.subscriptionsApi.getInvoices().subscribe({
-          next: invoices => this.invoicesSignal.set(invoices.filter(invoice => invoice.subscriptionId === subscription.id)),
-          error: err => this.errorSignal.set(this.formatError(err, 'Failed to load invoices'))
-        });
       },
       error: err => {
         this.errorSignal.set(this.formatError(err, 'Failed to load the subscription'));
@@ -99,14 +98,17 @@ export class SubscriptionsStore {
    * @param billingEmail - Email of the administrator.
    */
   subscribe = (organizationId: number, planKey: string, billingCycle: string, billingEmail: string): void => {
-    const nextInvoice = new Date();
-    nextInvoice.setMonth(nextInvoice.getMonth() + (billingCycle === 'annual' ? 12 : 1));
-    this.subscriptionsApi.createSubscription(new Subscription({
-      id: 0, organizationId, planKey, billingCycle, status: 'pending', paymentState: 'approved',
-      nextInvoiceDate: nextInvoice.toISOString().slice(0, 10), autoRenew: true,
-      cardBrand: '', cardLast4: '', cardExpiry: '', billingEmail
-    })).pipe(retry(2)).subscribe({
-      next: subscription => this.subscriptionSignal.set(subscription),
+    const plan = this.plans().find(item => item.key === planKey);
+    if (!plan) {
+      this.errorSignal.set('Plan not found');
+      return;
+    }
+    // The registration does not ask for the card yet: test card of the Niubiz sandbox
+    this.subscriptionsApi.createSubscription({
+      organizationId, planId: plan.id, billingCycle: billingCycle.toUpperCase(),
+      cardBrand: 'Visa', cardLast4: '4242', cardExpiry: '08/2028', billingEmail
+    }).subscribe({
+      next: subscription => this.setSubscription(subscription),
       error: err => this.errorSignal.set(this.formatError(err, 'Failed to create the subscription'))
     });
   };
@@ -118,48 +120,52 @@ export class SubscriptionsStore {
    */
   changePlan = (planKey: string, billingCycle: string): void => {
     const subscription = this.subscription();
-    if (!subscription) return;
-    subscription.planKey = planKey;
-    subscription.billingCycle = billingCycle;
-    this.saveSubscription(subscription, 'Failed to change the plan');
-  };
-
-  /**
-   * Retries a declined charge: Niubiz approves it, an invoice is issued and the subscription becomes active.
-   */
-  retryPayment = (): void => {
-    const subscription = this.subscription();
-    if (!subscription) return;
-    const issuedAt = new Date().toISOString().slice(0, 10);
-    this.subscriptionsApi.createInvoice(new Invoice({
-      id: 0, subscriptionId: subscription.id, number: `INV-${issuedAt.slice(0, 4)}-${issuedAt.slice(5, 7)}01`,
-      issuedAt, amount: this.currentAmount(), status: 'approved'
-    })).subscribe({
-      next: invoice => this.invoicesSignal.update(invoices => [...invoices, invoice]),
-      error: err => this.errorSignal.set(this.formatError(err, 'Failed to register the payment'))
-    });
-    subscription.paymentState = 'approved';
-    subscription.status = 'active';
-    this.saveSubscription(subscription, 'Failed to update the subscription');
-  };
-
-  /**
-   * Persists the subscription and refreshes the signal.
-   * @param subscription - Subscription to save.
-   * @param errorMessage - Message shown if the request fails.
-   */
-  private saveSubscription(subscription: Subscription, errorMessage: string): void {
+    const plan = this.plans().find(item => item.key === planKey);
+    if (!subscription || !plan) return;
     this.loadingSignal.set(true);
-    this.subscriptionsApi.updateSubscription(subscription).pipe(retry(2)).subscribe({
+    this.errorSignal.set(null);
+    this.subscriptionsApi.changePlan(subscription.id, plan.id, billingCycle.toUpperCase()).subscribe({
       next: updated => {
-        this.subscriptionSignal.set(updated);
+        this.setSubscription(updated);
         this.loadingSignal.set(false);
       },
       error: err => {
-        this.errorSignal.set(this.formatError(err, errorMessage));
+        this.errorSignal.set(this.formatError(err, 'Failed to change the plan'));
         this.loadingSignal.set(false);
       }
     });
+  };
+
+  /**
+   * Retries a declined charge with Niubiz: an approved payment activates or renews the subscription
+   * and becomes a new invoice; a rejected or failed payment shows the reason sent by the platform.
+   * @param cardToken - Token of the card returned by the Niubiz checkout.
+   */
+  retryPayment = (cardToken = 'sandbox-card-token'): void => {
+    const subscription = this.subscription();
+    if (!subscription) return;
+    this.loadingSignal.set(true);
+    this.errorSignal.set(null);
+    this.subscriptionsApi.paySubscription(subscription.id, cardToken).subscribe({
+      next: updated => {
+        this.setSubscription(updated);
+        this.loadingSignal.set(false);
+      },
+      error: err => {
+        this.errorSignal.set(this.formatError(err, 'Failed to register the payment'));
+        this.loadingSignal.set(false);
+      }
+    });
+  };
+
+  /**
+   * Shows a subscription with the key of its plan and its invoices.
+   * @param subscription - Subscription sent by the platform, or null when the organization has none.
+   */
+  private setSubscription(subscription: Subscription | null): void {
+    if (subscription) subscription.planKey = this.plans().find(plan => plan.id === subscription.planId)?.key ?? '';
+    this.subscriptionSignal.set(subscription);
+    this.invoicesSignal.set(subscription?.invoices ?? []);
   }
 
   /**

@@ -1,54 +1,72 @@
 import {BaseAssembler} from '../../shared/infrastructure/base-assembler';
 import {Subscription} from '../domain/model/subscription.entity';
+import {Invoice} from '../domain/model/invoice.entity';
 import {SubscriptionResource, SubscriptionsResponse} from './subscriptions-response';
 
 /**
- * Maps subscription entities to and from API resources.
+ * The platform says REJECTED; the views of the Web Application say declined.
+ * @param status - Status sent by the platform.
+ * @returns Status used by the views.
+ */
+const toViewState = (status: string): string => status === 'REJECTED' ? 'declined' : status.toLowerCase();
+
+/**
+ * Maps subscription entities to and from the resources of the DoofPlus Platform.
  */
 export class SubscriptionAssembler implements BaseAssembler<Subscription, SubscriptionResource, SubscriptionsResponse> {
   /**
-   * Converts a SubscriptionsResponse to an array of Subscription entities.
-   * @param response - The API response containing subscription resources.
-   * @returns An array of Subscription entities.
+   * Converts a subscriptions response to entities.
+   * @param response - The subscriptions response.
+   * @returns The subscriptions.
    */
   toEntitiesFromResponse = (response: SubscriptionsResponse): Subscription[] =>
     response.subscriptions.map(resource => this.toEntityFromResource(resource));
 
   /**
-   * Converts a SubscriptionResource to a Subscription entity.
-   * @param resource - The resource to convert.
-   * @returns The converted Subscription entity.
+   * Converts a subscription resource to an entity; its payments become its invoices.
+   * @param resource - The subscription resource.
+   * @returns The subscription.
    */
-  toEntityFromResource = (resource: SubscriptionResource): Subscription =>
-    new Subscription({
+  toEntityFromResource = (resource: SubscriptionResource): Subscription => {
+    const payments = resource.payments ?? [];
+    const last = payments[payments.length - 1];
+    return new Subscription({
       id: resource.id,
       organizationId: resource.organizationId,
-      planKey: resource.planKey,
-      billingCycle: resource.billingCycle,
-      status: resource.status,
-      paymentState: resource.paymentState,
-      nextInvoiceDate: resource.nextInvoiceDate,
+      planId: resource.planId,
+      planKey: '',
+      billingCycle: resource.billingCycle.toLowerCase(),
+      status: resource.status.toLowerCase(),
+      paymentState: last ? toViewState(last.status) : 'pending',
+      nextInvoiceDate: resource.currentPeriodEnd ?? '',
       autoRenew: resource.autoRenew,
       cardBrand: resource.cardBrand,
       cardLast4: resource.cardLast4,
       cardExpiry: resource.cardExpiry,
-      billingEmail: resource.billingEmail
+      billingEmail: resource.billingEmail,
+      invoices: payments.map(payment => new Invoice({
+        id: payment.id,
+        subscriptionId: resource.id,
+        number: payment.invoiceNumber,
+        issuedAt: (payment.processedAt ?? '').slice(0, 10),
+        amount: payment.amount,
+        status: toViewState(payment.status)
+      }))
     });
+  };
 
   /**
-   * Converts a Subscription entity to a SubscriptionResource.
-   * @param entity - The entity to convert.
-   * @returns The converted SubscriptionResource.
+   * Converts a subscription entity to a resource.
+   * @param entity - The subscription.
+   * @returns The subscription resource.
    */
   toResourceFromEntity = (entity: Subscription): SubscriptionResource =>
     ({
       id: entity.id,
       organizationId: entity.organizationId,
-      planKey: entity.planKey,
-      billingCycle: entity.billingCycle,
-      status: entity.status,
-      paymentState: entity.paymentState,
-      nextInvoiceDate: entity.nextInvoiceDate,
+      planId: entity.planId,
+      billingCycle: entity.billingCycle.toUpperCase(),
+      status: entity.status.toUpperCase(),
       autoRenew: entity.autoRenew,
       cardBrand: entity.cardBrand,
       cardLast4: entity.cardLast4,
