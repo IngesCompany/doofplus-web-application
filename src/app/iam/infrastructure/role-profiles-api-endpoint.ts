@@ -14,6 +14,6 @@ export class RoleProfilesApiEndpoint extends BaseApiEndpoint<RoleProfile, RolePr
    * @param http - The HttpClient to be used for making API requests.
    */
   constructor(http: HttpClient) {
-    super(http, `${environment.platformProviderApiBaseUrl}${environment.platformProviderRoleProfilesEndpointPath}`, new RoleProfileAssembler());
+    super(http, `${environment.fakeApiBaseUrl}${environment.platformProviderRoleProfilesEndpointPath}`, new RoleProfileAssembler());
   }
 }

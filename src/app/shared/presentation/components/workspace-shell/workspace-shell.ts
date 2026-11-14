@@ -95,11 +95,12 @@ export class WorkspaceShell {
     const code = input.value.trim().toUpperCase();
     if (!code) return;
     for (const target of this.searchTargets) {
-      const url = `${environment.platformProviderApiBaseUrl}${target.endpoint}`;
-      const found = await firstValueFrom(this.http.get<{code: string}[]>(url, {params: {code}})).catch(() => []);
-      if (found.length) {
+      // The Fake API filters by code; the DoofPlus Platform returns the whole collection, so the exact code is matched here.
+      const records = await firstValueFrom(this.http.get<{code: string}[]>(target.url, {params: {code}})).catch(() => []);
+      const found = records.find(record => record.code?.toUpperCase() === code);
+      if (found) {
         input.value = '';
-        await this.router.navigateByUrl(target.route.replace('{code}', encodeURIComponent(found[0].code)));
+        await this.router.navigateByUrl(target.route.replace('{code}', encodeURIComponent(found.code)));
         return;
       }
     }

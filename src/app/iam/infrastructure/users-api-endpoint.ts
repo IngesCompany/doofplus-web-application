@@ -14,6 +14,6 @@ export class UsersApiEndpoint extends BaseApiEndpoint<User, UserResource, UsersR
    * @param http - The HttpClient to be used for making API requests.
    */
   constructor(http: HttpClient) {
-    super(http, `${environment.platformProviderApiBaseUrl}${environment.platformProviderUsersEndpointPath}`, new UserAssembler());
+    super(http, `${environment.fakeApiBaseUrl}${environment.platformProviderUsersEndpointPath}`, new UserAssembler());
   }
 }

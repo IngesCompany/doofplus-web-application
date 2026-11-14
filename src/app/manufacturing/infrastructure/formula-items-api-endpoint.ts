@@ -14,6 +14,6 @@ export class FormulaItemsApiEndpoint extends BaseApiEndpoint<FormulaItem, Formul
    * @param http - The HttpClient to be used for making API requests.
    */
   constructor(http: HttpClient) {
-    super(http, `${environment.platformProviderApiBaseUrl}${environment.platformProviderFormulaItemsEndpointPath}`, new FormulaItemAssembler());
+    super(http, `${environment.fakeApiBaseUrl}${environment.platformProviderFormulaItemsEndpointPath}`, new FormulaItemAssembler());
   }
 }

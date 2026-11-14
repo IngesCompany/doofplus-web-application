@@ -14,6 +14,6 @@ export class ProductsApiEndpoint extends BaseApiEndpoint<Product, ProductResourc
    * @param http - The HttpClient to be used for making API requests.
    */
   constructor(http: HttpClient) {
-    super(http, `${environment.platformProviderApiBaseUrl}${environment.platformProviderProductsEndpointPath}`, new ProductAssembler());
+    super(http, `${environment.fakeApiBaseUrl}${environment.platformProviderProductsEndpointPath}`, new ProductAssembler());
   }
 }

@@ -14,6 +14,6 @@ export class CapaActionsApiEndpoint extends BaseApiEndpoint<CapaAction, CapaActi
    * @param http - The HttpClient to be used for making API requests.
    */
   constructor(http: HttpClient) {
-    super(http, `${environment.platformProviderApiBaseUrl}${environment.platformProviderCapaActionsEndpointPath}`, new CapaActionAssembler());
+    super(http, `${environment.fakeApiBaseUrl}${environment.platformProviderCapaActionsEndpointPath}`, new CapaActionAssembler());
   }
 }

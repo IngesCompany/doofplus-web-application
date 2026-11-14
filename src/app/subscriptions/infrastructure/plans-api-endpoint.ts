@@ -14,6 +14,6 @@ export class PlansApiEndpoint extends BaseApiEndpoint<Plan, PlanResource, PlansR
    * @param http - The HttpClient to be used for making API requests.
    */
   constructor(http: HttpClient) {
-    super(http, `${environment.platformProviderApiBaseUrl}${environment.platformProviderPlansEndpointPath}`, new PlanAssembler());
+    super(http, `${environment.fakeApiBaseUrl}${environment.platformProviderPlansEndpointPath}`, new PlanAssembler());
   }
 }

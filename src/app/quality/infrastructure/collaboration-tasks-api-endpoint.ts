@@ -14,6 +14,6 @@ export class CollaborationTasksApiEndpoint extends BaseApiEndpoint<Collaboration
    * @param http - The HttpClient to be used for making API requests.
    */
   constructor(http: HttpClient) {
-    super(http, `${environment.platformProviderApiBaseUrl}${environment.platformProviderCollaborationTasksEndpointPath}`, new CollaborationTaskAssembler());
+    super(http, `${environment.fakeApiBaseUrl}${environment.platformProviderCollaborationTasksEndpointPath}`, new CollaborationTaskAssembler());
   }
 }

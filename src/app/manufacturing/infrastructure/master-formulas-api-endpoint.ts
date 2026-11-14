@@ -14,6 +14,6 @@ export class MasterFormulasApiEndpoint extends BaseApiEndpoint<MasterFormula, Ma
    * @param http - The HttpClient to be used for making API requests.
    */
   constructor(http: HttpClient) {
-    super(http, `${environment.platformProviderApiBaseUrl}${environment.platformProviderMasterFormulasEndpointPath}`, new MasterFormulaAssembler());
+    super(http, `${environment.fakeApiBaseUrl}${environment.platformProviderMasterFormulasEndpointPath}`, new MasterFormulaAssembler());
   }
 }

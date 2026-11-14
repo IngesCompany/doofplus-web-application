@@ -24,9 +24,9 @@ export interface NavigationOption {
  */
 export interface SearchTarget {
   /**
-   * Endpoint path of the collection, relative to the API base URL.
+   * URL of the collection: the DoofPlus Platform or, for the bounded contexts not connected yet, the Fake API.
    */
-  endpoint: string;
+  url: string;
   /**
    * Route that opens the record; `{code}` is replaced by the code found.
    */
@@ -85,8 +85,8 @@ export const workspaceEnvironments: Record<WorkspaceEnvironment, EnvironmentProf
       { link: '/qa/tasks', label: 'nav.tasks' }
     ],
     search: [
-      { endpoint: environment.platformProviderQualityDocumentsEndpointPath, route: '/qa/documents?code={code}' },
-      { endpoint: environment.platformProviderBatchesEndpointPath, route: '/qa/batch-release?code={code}' }
+      { url: `${environment.fakeApiBaseUrl}${environment.platformProviderQualityDocumentsEndpointPath}`, route: '/qa/documents?code={code}' },
+      { url: `${environment.fakeApiBaseUrl}${environment.platformProviderBatchesEndpointPath}`, route: '/qa/batch-release?code={code}' }
     ],
     searchExample: 'SOP-QA-014'
   },
@@ -106,9 +106,9 @@ export const workspaceEnvironments: Record<WorkspaceEnvironment, EnvironmentProf
       { link: '/production/tasks', label: 'nav.tasks' }
     ],
     search: [
-      { endpoint: environment.platformProviderBatchesEndpointPath, route: '/production/batches/{code}' },
-      { endpoint: environment.platformProviderProductionOrdersEndpointPath, route: '/production/orders/{code}' },
-      { endpoint: environment.platformProviderSensorsEndpointPath, route: '/production/sensors/{code}' }
+      { url: `${environment.fakeApiBaseUrl}${environment.platformProviderBatchesEndpointPath}`, route: '/production/batches/{code}' },
+      { url: `${environment.fakeApiBaseUrl}${environment.platformProviderProductionOrdersEndpointPath}`, route: '/production/orders/{code}' },
+      { url: `${environment.platformProviderApiBaseUrl}${environment.platformProviderSensorsEndpointPath}`, route: '/production/sensors/{code}' }
     ],
     searchExample: 'B-26041'
   },

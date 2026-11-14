@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-11-14
+### Added
+- Organizations & Profiles and IoT Monitoring use the DoofPlus Platform RESTful API published on Render (`platformProviderApiBaseUrl`): organizations, facilities, user profiles, administrative activities, contact inquiries, equipment, sensors, readings and alerts.
+### Changed
+- IAM, Manufacturing, Quality & Compliance and Subscriptions keep the Fake API (`fakeApiBaseUrl`) until their endpoints match the Web Application.
+- The global search matches the exact code of each record, so it works with the API and the Fake API.
+
+
 ## [1.1.0] - 2026-11-09
 ### Added
 - Public "Contact us" page (`/contact`) in the Organizations & Profiles bounded context: the inquiry is stored as a `ContactInquiry` with status `received`, with validation, confirmation, English and Spanish texts and ARIA attributes. It is linked from the public header and from the environment selection.
