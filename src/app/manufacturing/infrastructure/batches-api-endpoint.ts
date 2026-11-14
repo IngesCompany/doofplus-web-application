@@ -14,6 +14,6 @@ export class BatchesApiEndpoint extends BaseApiEndpoint<Batch, BatchResource, Ba
    * @param http - The HttpClient to be used for making API requests.
    */
   constructor(http: HttpClient) {
-    super(http, `${environment.platformProviderApiBaseUrl}${environment.platformProviderBatchesEndpointPath}`, new BatchAssembler());
+    super(http, `${environment.fakeApiBaseUrl}${environment.platformProviderBatchesEndpointPath}`, new BatchAssembler());
   }
 }

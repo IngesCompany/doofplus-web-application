@@ -1,7 +1,9 @@
 export const environment = {
   production: true,
-  // Fake API (json-server) published on Render until the DoofPlus Platform (Web Services) is deployed
-  platformProviderApiBaseUrl: 'https://ingescompany-frontend.onrender.com/api/v1',
+  // DoofPlus Platform (RESTful Web Services) published on Render: Organizations and IoT Monitoring
+  platformProviderApiBaseUrl: 'https://doofplus-platform.onrender.com/api/v1',
+  // Fake API (json-server) published on Render for the bounded contexts not connected yet: IAM, Manufacturing, Quality and Subscriptions
+  fakeApiBaseUrl: 'https://ingescompany-frontend.onrender.com/api/v1',
   platformProviderQualityDocumentsEndpointPath: '/quality-documents',
   platformProviderDeviationsEndpointPath: '/deviations',
   platformProviderEvidenceEndpointPath: '/evidence',

@@ -14,6 +14,6 @@ export class TraceabilityGapsApiEndpoint extends BaseApiEndpoint<TraceabilityGap
    * @param http - The HttpClient to be used for making API requests.
    */
   constructor(http: HttpClient) {
-    super(http, `${environment.platformProviderApiBaseUrl}${environment.platformProviderTraceabilityGapsEndpointPath}`, new TraceabilityGapAssembler());
+    super(http, `${environment.fakeApiBaseUrl}${environment.platformProviderTraceabilityGapsEndpointPath}`, new TraceabilityGapAssembler());
   }
 }

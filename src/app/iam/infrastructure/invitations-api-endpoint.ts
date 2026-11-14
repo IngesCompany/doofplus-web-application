@@ -14,6 +14,6 @@ export class InvitationsApiEndpoint extends BaseApiEndpoint<Invitation, Invitati
    * @param http - The HttpClient to be used for making API requests.
    */
   constructor(http: HttpClient) {
-    super(http, `${environment.platformProviderApiBaseUrl}${environment.platformProviderInvitationsEndpointPath}`, new InvitationAssembler());
+    super(http, `${environment.fakeApiBaseUrl}${environment.platformProviderInvitationsEndpointPath}`, new InvitationAssembler());
   }
 }

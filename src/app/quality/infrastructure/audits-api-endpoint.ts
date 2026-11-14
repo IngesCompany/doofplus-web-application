@@ -14,6 +14,6 @@ export class AuditsApiEndpoint extends BaseApiEndpoint<Audit, AuditResource, Aud
    * @param http - The HttpClient to be used for making API requests.
    */
   constructor(http: HttpClient) {
-    super(http, `${environment.platformProviderApiBaseUrl}${environment.platformProviderAuditsEndpointPath}`, new AuditAssembler());
+    super(http, `${environment.fakeApiBaseUrl}${environment.platformProviderAuditsEndpointPath}`, new AuditAssembler());
   }
 }

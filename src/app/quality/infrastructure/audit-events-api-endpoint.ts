@@ -14,6 +14,6 @@ export class AuditEventsApiEndpoint extends BaseApiEndpoint<AuditEvent, AuditEve
    * @param http - The HttpClient to be used for making API requests.
    */
   constructor(http: HttpClient) {
-    super(http, `${environment.platformProviderApiBaseUrl}${environment.platformProviderAuditEventsEndpointPath}`, new AuditEventAssembler());
+    super(http, `${environment.fakeApiBaseUrl}${environment.platformProviderAuditEventsEndpointPath}`, new AuditEventAssembler());
   }
 }

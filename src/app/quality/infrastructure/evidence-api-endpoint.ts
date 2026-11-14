@@ -14,6 +14,6 @@ export class EvidenceApiEndpoint extends BaseApiEndpoint<Evidence, EvidenceResou
    * @param http - The HttpClient to be used for making API requests.
    */
   constructor(http: HttpClient) {
-    super(http, `${environment.platformProviderApiBaseUrl}${environment.platformProviderEvidenceEndpointPath}`, new EvidenceAssembler());
+    super(http, `${environment.fakeApiBaseUrl}${environment.platformProviderEvidenceEndpointPath}`, new EvidenceAssembler());
   }
 }

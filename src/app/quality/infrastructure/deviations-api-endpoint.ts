@@ -14,6 +14,6 @@ export class DeviationsApiEndpoint extends BaseApiEndpoint<Deviation, DeviationR
    * @param http - The HttpClient to be used for making API requests.
    */
   constructor(http: HttpClient) {
-    super(http, `${environment.platformProviderApiBaseUrl}${environment.platformProviderDeviationsEndpointPath}`, new DeviationAssembler());
+    super(http, `${environment.fakeApiBaseUrl}${environment.platformProviderDeviationsEndpointPath}`, new DeviationAssembler());
   }
 }

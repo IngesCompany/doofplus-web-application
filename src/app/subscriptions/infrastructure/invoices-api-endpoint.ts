@@ -14,6 +14,6 @@ export class InvoicesApiEndpoint extends BaseApiEndpoint<Invoice, InvoiceResourc
    * @param http - The HttpClient to be used for making API requests.
    */
   constructor(http: HttpClient) {
-    super(http, `${environment.platformProviderApiBaseUrl}${environment.platformProviderInvoicesEndpointPath}`, new InvoiceAssembler());
+    super(http, `${environment.fakeApiBaseUrl}${environment.platformProviderInvoicesEndpointPath}`, new InvoiceAssembler());
   }
 }

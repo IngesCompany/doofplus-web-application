@@ -14,6 +14,6 @@ export class QualityDocumentsApiEndpoint extends BaseApiEndpoint<QualityDocument
    * @param http - The HttpClient to be used for making API requests.
    */
   constructor(http: HttpClient) {
-    super(http, `${environment.platformProviderApiBaseUrl}${environment.platformProviderQualityDocumentsEndpointPath}`, new QualityDocumentAssembler());
+    super(http, `${environment.fakeApiBaseUrl}${environment.platformProviderQualityDocumentsEndpointPath}`, new QualityDocumentAssembler());
   }
 }

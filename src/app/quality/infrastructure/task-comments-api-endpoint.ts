@@ -14,6 +14,6 @@ export class TaskCommentsApiEndpoint extends BaseApiEndpoint<TaskComment, TaskCo
    * @param http - The HttpClient to be used for making API requests.
    */
   constructor(http: HttpClient) {
-    super(http, `${environment.platformProviderApiBaseUrl}${environment.platformProviderTaskCommentsEndpointPath}`, new TaskCommentAssembler());
+    super(http, `${environment.fakeApiBaseUrl}${environment.platformProviderTaskCommentsEndpointPath}`, new TaskCommentAssembler());
   }
 }
