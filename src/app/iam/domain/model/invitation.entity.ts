@@ -9,6 +9,8 @@ export class Invitation implements BaseEntity {
    */
   #id: number;
 
+  #organizationId: number;
+
   /**
    * Full name of the invited person.
    */
@@ -48,8 +50,9 @@ export class Invitation implements BaseEntity {
    * Creates a new invitation.
    * @param invitation - Initial values of the invitation.
    */
-  constructor(invitation: { id: number; fullName: string; email: string; role: string; facility: string; note: string; status: string; sentAt: string }) {
+  constructor(invitation: { id: number; organizationId?: number; fullName: string; email: string; role: string; facility: string; note: string; status: string; sentAt: string }) {
     this.#id = invitation.id;
+    this.#organizationId = invitation.organizationId ?? 0;
     this.#fullName = invitation.fullName;
     this.#email = invitation.email;
     this.#role = invitation.role;
@@ -61,6 +64,9 @@ export class Invitation implements BaseEntity {
 
   get id(): number { return this.#id; }
   set id(value: number) { this.#id = value; }
+
+  get organizationId(): number { return this.#organizationId; }
+  set organizationId(value: number) { this.#organizationId = value; }
 
   get fullName(): string { return this.#fullName; }
   set fullName(value: string) { this.#fullName = value; }

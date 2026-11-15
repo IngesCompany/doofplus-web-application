@@ -1,9 +1,8 @@
 export const environment = {
   production: false,
-  // DoofPlus Platform (RESTful Web Services) running locally: IAM (sign-in, sign-up, users), Organizations, IoT Monitoring, Manufacturing and Quality
+  // DoofPlus Platform (RESTful Web Services) running locally: every bounded context
   platformProviderApiBaseUrl: 'http://localhost:8080/api/v1',
   // Fake API (json-server, npm run server) for the resources not connected yet: IAM profiles and invitations and Subscriptions
-  fakeApiBaseUrl: 'http://localhost:3000/api/v1',
   platformProviderQualityDocumentsEndpointPath: '/quality-documents',
   platformProviderDeviationsEndpointPath: '/deviations',
   platformProviderEvidenceEndpointPath: '/evidence',
@@ -25,11 +24,10 @@ export const environment = {
   platformProviderContactInquiriesEndpointPath: '/contact-inquiries',
   platformProviderPlansEndpointPath: '/plans',
   platformProviderSubscriptionsEndpointPath: '/subscriptions',
-  platformProviderInvoicesEndpointPath: '/invoices',
   platformProviderSignInEndpointPath: '/authentication/sign-in',
   platformProviderSignUpEndpointPath: '/authentication/sign-up',
   platformProviderUsersEndpointPath: '/users',
-  platformProviderRoleProfilesEndpointPath: '/role-profiles',
+  platformProviderRolesEndpointPath: '/roles',
   platformProviderInvitationsEndpointPath: '/invitations',
   platformProviderProductsEndpointPath: '/products',
   platformProviderMasterFormulasEndpointPath: '/master-formulas',

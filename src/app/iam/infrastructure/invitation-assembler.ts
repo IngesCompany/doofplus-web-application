@@ -1,6 +1,7 @@
 import {BaseAssembler} from '../../shared/infrastructure/base-assembler';
 import {Invitation} from '../domain/model/invitation.entity';
 import {InvitationResource, InvitationsResponse} from './invitations-response';
+import {fromPlatformEnum} from '../../manufacturing/infrastructure/platform-enum';
 
 /**
  * Maps invitation entities to and from API resources.
@@ -22,12 +23,13 @@ export class InvitationAssembler implements BaseAssembler<Invitation, Invitation
   toEntityFromResource = (resource: InvitationResource): Invitation =>
     new Invitation({
       id: resource.id,
+      organizationId: resource.organizationId,
       fullName: resource.fullName,
       email: resource.email,
       role: resource.role,
       facility: resource.facility,
-      note: resource.note,
-      status: resource.status,
+      note: resource.note ?? '',
+      status: fromPlatformEnum(resource.status),
       sentAt: resource.sentAt
     });
 
@@ -39,6 +41,7 @@ export class InvitationAssembler implements BaseAssembler<Invitation, Invitation
   toResourceFromEntity = (entity: Invitation): InvitationResource =>
     ({
       id: entity.id,
+      organizationId: entity.organizationId,
       fullName: entity.fullName,
       email: entity.email,
       role: entity.role,
