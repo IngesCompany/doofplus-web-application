@@ -1,8 +1,8 @@
 {
   "page-not-found": {
     "title": "Page not found",
-    "content": "The path <strong>{{invalid_path}}</strong> does not exist.",
-    "go-home": "Go to sign in"
+    "content": "The page {{invalid_path}} does not exist or was moved.",
+    "go-home": "Go to the home page"
   },
   "footer": {
     "copyright": "Copyright © 2026 IngesCompany. All rights reserved.",
@@ -197,7 +197,10 @@
       "verified": "Verified",
       "pending": "Pending",
       "request-inspection": "Request QC inspection",
-      "disposition-text": "A QA/QC specialist submits the analytical results and an authorized quality manager approves or rejects the lot. A rejection requires a reason and keeps the stock segregated."
+      "disposition-text": "A QA/QC specialist submits the analytical results and an authorized quality manager approves or rejects the lot. A rejection requires a reason and keeps the stock segregated.",
+      "toast-duplicate": "The internal lot code already exists.",
+      "toast-invalid": "Complete the required fields and attach the certificate of analysis (PDF).",
+      "toast-recorded": "Lot {{code}} was recorded and sent to sampling."
     },
     "overview": {
       "subtitle": "{{name}}, keep today's schedule moving with visibility into orders, batches and equipment.",
@@ -251,7 +254,8 @@
     "legal": "Legal information",
     "cancel": "Cancel",
     "status": "Status",
-    "contact-us": "Contact us"
+    "contact-us": "Contact us",
+    "language": "Language"
   },
   "nav": {
     "quality-overview": "Quality overview",
@@ -439,7 +443,8 @@
       "required": "Required fields. Your information is used only to set up this organization.",
       "verify-title": "Check your email",
       "verify-text": "We sent a verification link to {{email}}. Open it to activate the workspace; then sign in and enroll two-factor authentication.",
-      "go-sign-in": "Go to sign in"
+      "go-sign-in": "Go to sign in",
+      "your-email": "your email"
     },
     "profile": {
       "my-account": "My account",
@@ -965,7 +970,9 @@
       "assessment": "QA product-impact assessment",
       "capa-linked": "CAPA linked",
       "release-decision": "Release decision",
-      "blocked-until": "Blocked until approved disposition"
+      "blocked-until": "Blocked until approved disposition",
+      "remove-evidence": "Remove evidence",
+      "toast-evidence-removed": "Evidence removed."
     },
     "capa": {
       "title": "CAPA plan",
@@ -1003,7 +1010,8 @@
       "required-text": "All items are required before routing the plan.",
       "uploaded": "Uploaded",
       "pending": "Pending",
-      "uploaded-count": "{{count}} of {{total}} items uploaded · approval blocked until all are attached"
+      "uploaded-count": "{{count}} of {{total}} items uploaded · approval blocked until all are attached",
+      "toast-root-cause-saved": "Root cause saved."
     },
     "release": {
       "released": "{{code}} was released with an electronic signature.",
@@ -1103,7 +1111,13 @@
       "plan-evidence": "Evidence review",
       "plan-closing": "Closing meeting",
       "plan-report": "Final report approval",
-      "package": "Evidence package"
+      "package": "Evidence package",
+      "metadata": {
+        "questions": "questions",
+        "reviewed": "Reviewed",
+        "uploaded": "Uploaded",
+        "version": "Version"
+      }
     },
     "trail": {
       "subtitle": "Attributed record events with before/after values and controlled exports.",

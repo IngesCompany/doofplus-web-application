@@ -1,12 +1,12 @@
 import {Component, inject, input} from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {map} from 'rxjs';
-import {TranslateService} from '@ngx-translate/core';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 import {MatButtonToggle, MatButtonToggleGroup} from '@angular/material/button-toggle';
 
 @Component({
   selector: 'app-language-switcher',
-  imports: [MatButtonToggleGroup, MatButtonToggle],
+  imports: [MatButtonToggleGroup, MatButtonToggle, TranslatePipe],
   templateUrl: './language-switcher.html',
   styleUrl: './language-switcher.css',
 })

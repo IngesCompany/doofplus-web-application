@@ -120,7 +120,7 @@ export class OrganizationRegistration extends BaseForm implements OnInit, LeaveC
   /**
    * Email shown in the verification notice.
    */
-  protected readonly administratorEmail = computed(() => this.formValue().administratorEmail || 'your email');
+  protected readonly administratorEmail = computed(() => this.formValue().administratorEmail || this.translate.instant('organizations.registration.your-email'));
 
   /**
    * Starts the registration at the form.

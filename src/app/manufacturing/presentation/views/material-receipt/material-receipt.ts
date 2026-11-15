@@ -1,7 +1,7 @@
 import {Component, computed, inject, signal} from '@angular/core';
 import {DatePipe} from '@angular/common';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {TranslatePipe} from '@ngx-translate/core';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 import {BaseForm} from '../../../../shared/presentation/components/base-form/base-form';
 import {MatIcon} from '@angular/material/icon';
 import {PageHeader} from '../../../../shared/presentation/components/page-header/page-header';
@@ -37,6 +37,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 export class MaterialReceipt extends BaseForm {
   protected readonly store = inject(ManufacturingStore);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translate = inject(TranslateService);
   /**
    * Steps of the receipt flow.
    */
@@ -124,17 +125,13 @@ export class MaterialReceipt extends BaseForm {
   protected record(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.snackBar.open(
-        'Por favor completa todos los campos requeridos y adjunta el certificado (PDF)',
-        'OK',
-        { duration: 4000 },
-      );
+      this.snackBar.open(this.translate.instant('manufacturing.receipt.toast-invalid'), 'OK', { duration: 4000 });
       return;
     }
     const value = this.form.getRawValue();
     this.duplicateLot.set(this.store.materialLots().some((lot) => lot.code === value.code));
     if (this.duplicateLot()) {
-      this.snackBar.open('El código de lote interno ya existe', 'OK', { duration: 3000 });
+      this.snackBar.open(this.translate.instant('manufacturing.receipt.toast-duplicate'), 'OK', { duration: 3000 });
       return;
     }
     this.store.addMaterialLot(
@@ -168,7 +165,7 @@ export class MaterialReceipt extends BaseForm {
       storageLocation: 'Q-A12 · Quarantine zone',
       certificate: '',
     });
-    this.snackBar.open(`Lote ${value.code} registrado con éxito y enviado a muestreo`, 'OK', {
+    this.snackBar.open(this.translate.instant('manufacturing.receipt.toast-recorded', {code: value.code}), 'OK', {
       duration: 3500,
     });
   }

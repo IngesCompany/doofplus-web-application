@@ -237,12 +237,15 @@ export class QualityStore {
   };
 
   /**
-   * Removes a piece of evidence.
+   * Removes evidence attached by mistake. Reviewed evidence cannot be removed, so the investigation keeps its integrity.
    * @param evidence - Evidence to delete.
+   * @returns False when the evidence was already reviewed.
    */
-  deleteEvidence = (evidence: Evidence): void => {
+  deleteEvidence = (evidence: Evidence): boolean => {
+    if (evidence.status === 'reviewed') return false;
     this.evidenceSignal.update((items) => items.filter((item) => item.id !== evidence.id));
     this.log('Evidence removed', evidence.recordCode, 'Deleted');
+    return true;
   };
 
   /**

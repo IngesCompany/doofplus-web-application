@@ -2,7 +2,7 @@ import {Component, computed, effect, inject, signal} from '@angular/core';
 import {DatePipe} from '@angular/common';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {ActivatedRoute, RouterLink} from '@angular/router';
-import {TranslatePipe} from '@ngx-translate/core';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {PageHeader} from '../../../../shared/presentation/components/page-header/page-header';
 import {QualityStore} from '../../../application/quality.store';
@@ -43,6 +43,7 @@ export class DeviationDetail {
   protected readonly store = inject(QualityStore);
   private readonly route = inject(ActivatedRoute);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translate = inject(TranslateService);
 
   /**
    * Code of the deviation shown.
@@ -161,8 +162,8 @@ export class DeviationDetail {
    * @param item - Evidence to remove.
    */
   protected removeEvidence(item: Evidence): void {
-    this.store.deleteEvidence(item);
-    this.snackBar.open('Evidencia eliminada / Evidence removed', 'OK', { duration: 2500 });
+    if (!this.store.deleteEvidence(item)) return;
+    this.snackBar.open(this.translate.instant('quality.deviations.toast-evidence-removed'), 'OK', { duration: 2500 });
   }
 }
 
