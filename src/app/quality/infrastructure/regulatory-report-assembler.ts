@@ -1,6 +1,17 @@
 import {BaseAssembler} from '../../shared/infrastructure/base-assembler';
 import {RegulatoryReport} from '../domain/model/regulatory-report.entity';
 import {RegulatoryReportResource, RegulatoryReportsResponse} from './regulatory-reports-response';
+import {fromPlatform} from './platform-resource';
+
+/**
+ * Names shown for the report types of the DoofPlus Platform. The platform accepts these names back.
+ */
+const REPORT_TYPES: Record<string, string> = {
+  BATCH_DOSSIER: 'Batch dossier',
+  QUALITY_REVIEW: 'Quality review',
+  CAPA_SUMMARY: 'CAPA summary',
+  AUDIT_EVIDENCE: 'Audit evidence'
+};
 
 /**
  * Maps regulatory report entities to and from API resources.
@@ -19,11 +30,12 @@ export class RegulatoryReportAssembler implements BaseAssembler<RegulatoryReport
    * @param resource - The resource to convert.
    * @returns The converted RegulatoryReport entity.
    */
-  toEntityFromResource = (resource: RegulatoryReportResource): RegulatoryReport =>
-    new RegulatoryReport({
+  toEntityFromResource = (platformResource: RegulatoryReportResource): RegulatoryReport => {
+    const resource = fromPlatform(platformResource, ['status']);
+    return new RegulatoryReport({
       id: resource.id,
       code: resource.code,
-      type: resource.type,
+      type: REPORT_TYPES[platformResource.type] ?? platformResource.type,
       scope: resource.scope,
       owner: resource.owner,
       status: resource.status,
@@ -31,6 +43,7 @@ export class RegulatoryReportAssembler implements BaseAssembler<RegulatoryReport
       format: resource.format,
       createdAt: resource.createdAt
     });
+  };
 
   /**
    * Converts a RegulatoryReport entity to a RegulatoryReportResource.

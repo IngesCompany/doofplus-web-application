@@ -1,6 +1,7 @@
 import {BaseAssembler} from '../../shared/infrastructure/base-assembler';
 import {Audit} from '../domain/model/audit.entity';
 import {AuditResource, AuditsResponse} from './audits-response';
+import {fromPlatform} from './platform-resource';
 
 /**
  * Maps audit entities to and from API resources.
@@ -19,8 +20,9 @@ export class AuditAssembler implements BaseAssembler<Audit, AuditResource, Audit
    * @param resource - The resource to convert.
    * @returns The converted Audit entity.
    */
-  toEntityFromResource = (resource: AuditResource): Audit =>
-    new Audit({
+  toEntityFromResource = (platformResource: AuditResource): Audit => {
+    const resource = fromPlatform(platformResource, ['status']);
+    return new Audit({
       id: resource.id,
       code: resource.code,
       title: resource.title,
@@ -29,6 +31,7 @@ export class AuditAssembler implements BaseAssembler<Audit, AuditResource, Audit
       areasTotal: resource.areasTotal,
       status: resource.status
     });
+  };
 
   /**
    * Converts a Audit entity to a AuditResource.

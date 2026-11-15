@@ -32,7 +32,7 @@ import {DeviationTrend} from '../domain/model/deviation-trend.entity';
 import {DeviationTrendsApiEndpoint} from './deviation-trends-api-endpoint';
 
 /**
- * Infrastructure facade for the Quality & Compliance endpoints.
+ * Infrastructure facade for the Quality & Compliance endpoints of the DoofPlus Platform.
  */
 @Injectable({providedIn: 'root'})
 export class QualityApi extends BaseApi {
@@ -79,6 +79,13 @@ export class QualityApi extends BaseApi {
   /** Updates a evidence. */
   updateEvidence = (item: Evidence): Observable<Evidence> => this.evidenceEndpoint.update(item, item.id);
 
+  /**
+   * Removes evidence attached by mistake; the platform answers 409 when it is reviewed.
+   * @param item - The evidence to remove.
+   * @returns Stream that completes when it is removed.
+   */
+  deleteEvidence = (item: Evidence): Observable<void> => this.evidenceEndpoint.delete(item.id);
+
   /** Retrieves all CAPA plan records. */
   getCapaPlans = (): Observable<CapaPlan[]> => this.capaPlansEndpoint.getAll();
 
@@ -112,8 +119,6 @@ export class QualityApi extends BaseApi {
   /** Creates a audit. */
   createAudit = (item: Audit): Observable<Audit> => this.auditsEndpoint.create(item);
 
-  /** Updates a audit. */
-  updateAudit = (item: Audit): Observable<Audit> => this.auditsEndpoint.update(item, item.id);
 
   /** Retrieves all audit finding records. */
   getAuditFindings = (): Observable<AuditFinding[]> => this.auditFindingsEndpoint.getAll();
@@ -121,8 +126,6 @@ export class QualityApi extends BaseApi {
   /** Creates a audit finding. */
   createAuditFinding = (item: AuditFinding): Observable<AuditFinding> => this.auditFindingsEndpoint.create(item);
 
-  /** Updates a audit finding. */
-  updateAuditFinding = (item: AuditFinding): Observable<AuditFinding> => this.auditFindingsEndpoint.update(item, item.id);
 
   /** Retrieves all audit event records. */
   getAuditEvents = (): Observable<AuditEvent[]> => this.auditEventsEndpoint.getAll();
@@ -130,8 +133,6 @@ export class QualityApi extends BaseApi {
   /** Creates a audit event. */
   createAuditEvent = (item: AuditEvent): Observable<AuditEvent> => this.auditEventsEndpoint.create(item);
 
-  /** Updates a audit event. */
-  updateAuditEvent = (item: AuditEvent): Observable<AuditEvent> => this.auditEventsEndpoint.update(item, item.id);
 
   /** Retrieves all regulatory report records. */
   getRegulatoryReports = (): Observable<RegulatoryReport[]> => this.regulatoryReportsEndpoint.getAll();
@@ -139,8 +140,6 @@ export class QualityApi extends BaseApi {
   /** Creates a regulatory report. */
   createRegulatoryReport = (item: RegulatoryReport): Observable<RegulatoryReport> => this.regulatoryReportsEndpoint.create(item);
 
-  /** Updates a regulatory report. */
-  updateRegulatoryReport = (item: RegulatoryReport): Observable<RegulatoryReport> => this.regulatoryReportsEndpoint.update(item, item.id);
 
   /** Retrieves all task records. */
   getCollaborationTasks = (): Observable<CollaborationTask[]> => this.collaborationTasksEndpoint.getAll();
@@ -148,8 +147,6 @@ export class QualityApi extends BaseApi {
   /** Creates a task. */
   createCollaborationTask = (item: CollaborationTask): Observable<CollaborationTask> => this.collaborationTasksEndpoint.create(item);
 
-  /** Updates a task. */
-  updateCollaborationTask = (item: CollaborationTask): Observable<CollaborationTask> => this.collaborationTasksEndpoint.update(item, item.id);
 
   /** Retrieves all comment records. */
   getTaskComments = (): Observable<TaskComment[]> => this.taskCommentsEndpoint.getAll();
@@ -157,8 +154,6 @@ export class QualityApi extends BaseApi {
   /** Creates a comment. */
   createTaskComment = (item: TaskComment): Observable<TaskComment> => this.taskCommentsEndpoint.create(item);
 
-  /** Updates a comment. */
-  updateTaskComment = (item: TaskComment): Observable<TaskComment> => this.taskCommentsEndpoint.update(item, item.id);
 
   /** Retrieves all traceability gap records. */
   getTraceabilityGaps = (): Observable<TraceabilityGap[]> => this.traceabilityGapsEndpoint.getAll();
@@ -166,15 +161,9 @@ export class QualityApi extends BaseApi {
   /** Creates a traceability gap. */
   createTraceabilityGap = (item: TraceabilityGap): Observable<TraceabilityGap> => this.traceabilityGapsEndpoint.create(item);
 
-  /** Updates a traceability gap. */
-  updateTraceabilityGap = (item: TraceabilityGap): Observable<TraceabilityGap> => this.traceabilityGapsEndpoint.update(item, item.id);
 
   /** Retrieves all deviation trend records. */
   getDeviationTrends = (): Observable<DeviationTrend[]> => this.deviationTrendsEndpoint.getAll();
 
-  /** Creates a deviation trend. */
-  createDeviationTrend = (item: DeviationTrend): Observable<DeviationTrend> => this.deviationTrendsEndpoint.create(item);
 
-  /** Updates a deviation trend. */
-  updateDeviationTrend = (item: DeviationTrend): Observable<DeviationTrend> => this.deviationTrendsEndpoint.update(item, item.id);
 }
