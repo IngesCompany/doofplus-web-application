@@ -1,5 +1,7 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
+import {IamStore} from '../../../../iam/application/iam.store';
+import {WorkspaceEnvironment, workspaceEnvironments} from '../../workspace-environments';
 import {TranslatePipe} from '@ngx-translate/core';
 import {MatButton} from '@angular/material/button';
 import {MatCard} from '@angular/material/card';
@@ -18,15 +20,18 @@ export class PageNotFound implements OnInit {
   protected invalidPath = '';
   private route: ActivatedRoute = inject(ActivatedRoute);
   private router: Router = inject(Router);
+  private iamStore = inject(IamStore);
 
   ngOnInit(): void {
     this.invalidPath = this.route.snapshot.url.map((url) => url.path).join('/');
   }
 
   /**
-   * Navigates to the sign-in, the entry point of the Web Application.
+   * Navigates to the home page: the first page of the user's workspace, or the sign-in when there is no session.
    */
   protected navigateToHome() {
-    this.router.navigate(['/sign-in']).then();
+    const user = this.iamStore.currentUser();
+    const home = user ? workspaceEnvironments[user.environment as WorkspaceEnvironment].navigation[0].link : '/sign-in';
+    this.router.navigate([home]).then();
   }
 }

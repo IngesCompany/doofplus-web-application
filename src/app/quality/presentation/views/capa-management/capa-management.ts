@@ -1,7 +1,7 @@
 import {Component, computed, effect, inject, signal} from '@angular/core';
 import {DatePipe} from '@angular/common';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
-import {TranslatePipe} from '@ngx-translate/core';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 import {MatIcon} from '@angular/material/icon';
 import {PageHeader} from '../../../../shared/presentation/components/page-header/page-header';
 import {CapaRejection, QualityStore} from '../../../application/quality.store';
@@ -37,6 +37,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 export class CapaManagement {
   protected readonly store = inject(QualityStore);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translate = inject(TranslateService);
   /**
    * Code of the plan shown.
    */
@@ -119,7 +120,7 @@ export class CapaManagement {
     plan.rootCause = this.rootCause.value.trim();
     this.store.saveCapa(plan);
     this.rootCause.markAsPristine();
-    this.snackBar.open('Root cause guardado con éxito / Root cause saved', 'OK', {
+    this.snackBar.open(this.translate.instant('quality.capa.toast-root-cause-saved'), 'OK', {
       duration: 3000,
     });
   }

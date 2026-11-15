@@ -1,8 +1,8 @@
 {
   "page-not-found": {
     "title": "Página no encontrada",
-    "content": "La ruta <strong>{{invalid_path}}</strong> no existe.",
-    "go-home": "Ir a iniciar sesión"
+    "content": "La página {{invalid_path}} no existe o fue movida.",
+    "go-home": "Ir al inicio"
   },
   "footer": {
     "copyright": "Copyright © 2026 IngesCompany. Todos los derechos reservados.",
@@ -197,7 +197,10 @@
       "verified": "Verificado",
       "pending": "Pendiente",
       "request-inspection": "Solicitar inspección de QC",
-      "disposition-text": "Un especialista QA/QC registra los resultados analíticos y una jefa de calidad autorizada aprueba o rechaza el lote. El rechazo exige un motivo y mantiene el stock segregado."
+      "disposition-text": "Un especialista QA/QC registra los resultados analíticos y una jefa de calidad autorizada aprueba o rechaza el lote. El rechazo exige un motivo y mantiene el stock segregado.",
+      "toast-duplicate": "El código de lote interno ya existe.",
+      "toast-invalid": "Completa los campos obligatorios y adjunta el certificado de análisis (PDF).",
+      "toast-recorded": "El lote {{code}} se registró y se envió a muestreo."
     },
     "overview": {
       "subtitle": "{{name}}, mantén el plan de hoy en marcha con visibilidad de órdenes, lotes y equipos.",
@@ -246,12 +249,13 @@
     "filters": "Filtros",
     "skip-to-content": "Saltar al contenido principal",
     "home": "Inicio de DoofPlus",
-    "main-navigation": "Navegación del workspace",
+    "main-navigation": "Navegación del espacio de trabajo",
     "user-menu": "Menú de usuario",
     "legal": "Información legal",
     "cancel": "Cancelar",
     "status": "Estado",
-    "contact-us": "Contáctanos"
+    "contact-us": "Contáctanos",
+    "language": "Idioma"
   },
   "nav": {
     "quality-overview": "Resumen de calidad",
@@ -439,7 +443,8 @@
       "required": "Campos obligatorios. Tus datos solo se usan para configurar esta organización.",
       "verify-title": "Revisa tu correo",
       "verify-text": "Enviamos un enlace de verificación a {{email}}. Ábrelo para activar el espacio; luego inicia sesión y registra la autenticación de dos pasos.",
-      "go-sign-in": "Ir a iniciar sesión"
+      "go-sign-in": "Ir a iniciar sesión",
+      "your-email": "tu correo"
     },
     "profile": {
       "my-account": "Mi cuenta",
@@ -965,7 +970,9 @@
       "assessment": "Evaluación de impacto de QA",
       "capa-linked": "CAPA vinculado",
       "release-decision": "Decisión de liberación",
-      "blocked-until": "Bloqueada hasta una disposición aprobada"
+      "blocked-until": "Bloqueada hasta una disposición aprobada",
+      "remove-evidence": "Quitar evidencia",
+      "toast-evidence-removed": "Evidencia eliminada."
     },
     "capa": {
       "title": "Plan CAPA",
@@ -1003,7 +1010,8 @@
       "required-text": "Todos los elementos son obligatorios antes de enviar el plan.",
       "uploaded": "Subida",
       "pending": "Pendiente",
-      "uploaded-count": "{{count}} de {{total}} elementos subidos · aprobación bloqueada hasta adjuntar todos"
+      "uploaded-count": "{{count}} de {{total}} elementos subidos · aprobación bloqueada hasta adjuntar todos",
+      "toast-root-cause-saved": "Causa raíz guardada."
     },
     "release": {
       "released": "{{code}} fue liberado con firma electrónica.",
@@ -1103,7 +1111,13 @@
       "plan-evidence": "Revisión de evidencias",
       "plan-closing": "Reunión de cierre",
       "plan-report": "Aprobación del informe final",
-      "package": "Paquete de evidencias"
+      "package": "Paquete de evidencias",
+      "metadata": {
+        "questions": "preguntas",
+        "reviewed": "Revisado",
+        "uploaded": "Subido",
+        "version": "Versión"
+      }
     },
     "trail": {
       "subtitle": "Eventos atribuidos de los registros con valores antes/después y exportaciones controladas.",

@@ -136,18 +136,12 @@ export class AuditManagement {
   }
 
   /**
-   * Translates evidence metadata when language is Spanish.
+   * Translates the metadata words of an evidence detail (Version, Reviewed, Uploaded, questions).
    * @param detail - Raw detail text.
    */
   protected formatDetail(detail: string): string {
     if (!detail) return '';
-    if (this.translate.currentLang() === 'es') {
-      return detail
-        .replace(/Version/g, 'Versión')
-        .replace(/Reviewed/g, 'Revisado')
-        .replace(/Uploaded/g, 'Subido')
-        .replace(/questions/g, 'preguntas');
-    }
-    return detail;
+    return detail.replace(/\b(Version|Reviewed|Uploaded|questions)\b/g,
+      word => this.translate.instant(`quality.audits.metadata.${word.toLowerCase()}`));
   }
 }
