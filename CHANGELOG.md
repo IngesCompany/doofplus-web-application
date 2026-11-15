@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-11-15
+### Added
+- IAM signs up and signs in with the DoofPlus Platform (JWT and two-factor code).
+- Subscriptions use the platform API for plans, subscriptions, payments and plan changes.
+- Manufacturing uses the platform API for products, master formulas, production orders, production batches and raw material lots.
+- Quality & Compliance uses the platform API (`contratos/quality-api.json`), including the removal of evidence not yet reviewed.
+### Changed
+- The toasts, labels and not found page of the workspace are translated into English and Spanish.
+- The global search of batches matches their batch number in the platform.
+
 ## [1.2.0] - 2026-11-14
 ### Added
 - Organizations & Profiles and IoT Monitoring use the DoofPlus Platform RESTful API published on Render (`platformProviderApiBaseUrl`): organizations, facilities, user profiles, administrative activities, contact inquiries, equipment, sensors, readings and alerts.
