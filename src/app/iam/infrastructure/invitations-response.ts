@@ -9,6 +9,10 @@ export interface InvitationResource extends BaseResource {
    */
   id: number;
   /**
+   * Organization that sent the invitation.
+   */
+  organizationId: number;
+  /**
    * Full name of the invited person.
    */
   fullName: string;
