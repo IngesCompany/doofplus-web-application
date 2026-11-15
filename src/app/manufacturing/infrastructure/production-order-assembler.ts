@@ -1,9 +1,10 @@
 import {BaseAssembler} from '../../shared/infrastructure/base-assembler';
 import {ProductionOrder} from '../domain/model/production-order.entity';
 import {ProductionOrderResource, ProductionOrdersResponse} from './production-orders-response';
+import {fromPlatformEnum} from './platform-enum';
 
 /**
- * Maps production order entities to and from API resources.
+ * Maps production order entities to and from the resources of the DoofPlus Platform.
  */
 export class ProductionOrderAssembler implements BaseAssembler<ProductionOrder, ProductionOrderResource, ProductionOrdersResponse> {
   /**
@@ -26,17 +27,17 @@ export class ProductionOrderAssembler implements BaseAssembler<ProductionOrder, 
       productCode: resource.productCode,
       formulaId: resource.formulaId,
       batchCode: resource.batchCode,
-      plannedQuantity: resource.plannedQuantity,
+      plannedQuantity: Number(resource.plannedQuantity),
       line: resource.line,
-      status: resource.status,
-      plannedStart: resource.plannedStart,
-      plannedEnd: resource.plannedEnd
+      status: fromPlatformEnum(resource.status),
+      plannedStart: resource.plannedStart ?? '',
+      plannedEnd: resource.plannedEnd ?? ''
     });
 
   /**
-   * Converts a ProductionOrder entity to a ProductionOrderResource.
+   * Converts a ProductionOrder entity to the body that creates it, without operations.
    * @param entity - The entity to convert.
-   * @returns The converted ProductionOrderResource.
+   * @returns The converted resource.
    */
   toResourceFromEntity = (entity: ProductionOrder): ProductionOrderResource =>
     ({
@@ -49,6 +50,7 @@ export class ProductionOrderAssembler implements BaseAssembler<ProductionOrder, 
       line: entity.line,
       status: entity.status,
       plannedStart: entity.plannedStart,
-      plannedEnd: entity.plannedEnd
+      plannedEnd: entity.plannedEnd,
+      operations: []
     } as ProductionOrderResource);
 }

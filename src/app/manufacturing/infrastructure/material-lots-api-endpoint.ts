@@ -6,7 +6,7 @@ import {MaterialLotResource, MaterialLotsResponse} from './material-lots-respons
 import {MaterialLotAssembler} from './material-lot-assembler';
 
 /**
- * Endpoint client for material lot CRUD operations.
+ * Endpoint client for the raw material lots of the DoofPlus Platform.
  */
 export class MaterialLotsApiEndpoint extends BaseApiEndpoint<MaterialLot, MaterialLotResource, MaterialLotsResponse, MaterialLotAssembler> {
   /**
@@ -14,6 +14,6 @@ export class MaterialLotsApiEndpoint extends BaseApiEndpoint<MaterialLot, Materi
    * @param http - The HttpClient to be used for making API requests.
    */
   constructor(http: HttpClient) {
-    super(http, `${environment.fakeApiBaseUrl}${environment.platformProviderMaterialLotsEndpointPath}`, new MaterialLotAssembler());
+    super(http, `${environment.platformProviderApiBaseUrl}${environment.platformProviderMaterialLotsEndpointPath}`, new MaterialLotAssembler());
   }
 }

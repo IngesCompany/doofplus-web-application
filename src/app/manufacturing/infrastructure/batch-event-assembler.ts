@@ -1,46 +1,44 @@
-import {BaseAssembler} from '../../shared/infrastructure/base-assembler';
 import {BatchEvent} from '../domain/model/batch-event.entity';
-import {BatchEventResource, BatchEventsResponse} from './batch-events-response';
+import {BatchEventResource} from './batch-events-response';
+import {fromPlatformEnum} from './platform-enum';
 
 /**
- * Maps batch event entities to and from API resources.
+ * Title shown for each type of event of the platform.
  */
-export class BatchEventAssembler implements BaseAssembler<BatchEvent, BatchEventResource, BatchEventsResponse> {
+const EVENT_TITLES: Record<string, string> = {
+  BATCH_CREATED: 'Created',
+  BATCH_STARTED: 'Production started',
+  BATCH_RESUMED: 'Production resumed',
+  INCIDENT_REGISTERED: 'Incident registered',
+  MATERIAL_CONSUMED: 'Material consumed',
+  RELEASE_REQUESTED: 'Release requested',
+  BATCH_RELEASED: 'Released for distribution'
+};
+
+/**
+ * Maps the events of a production batch of the DoofPlus Platform to batch event entities.
+ */
+export class BatchEventAssembler {
   /**
-   * Converts a BatchEventsResponse to an array of BatchEvent entities.
-   * @param response - The API response containing batch event resources.
-   * @returns An array of BatchEvent entities.
+   * Gives the title of a type of event.
+   * @param type - Type of the event answered by the platform.
+   * @returns The title shown in the history of the batch.
    */
-  toEntitiesFromResponse = (response: BatchEventsResponse): BatchEvent[] =>
-    response.batchEvents.map(resource => this.toEntityFromResource(resource));
+  titleOf = (type: string): string => EVENT_TITLES[type] ?? fromPlatformEnum(type);
 
   /**
-   * Converts a BatchEventResource to a BatchEvent entity.
-   * @param resource - The resource to convert.
+   * Converts an event of a batch to a BatchEvent entity.
+   * @param resource - The event answered inside the batch.
+   * @param batchCode - Number of the batch that holds the event.
    * @returns The converted BatchEvent entity.
    */
-  toEntityFromResource = (resource: BatchEventResource): BatchEvent =>
+  toEntityFromResource = (resource: BatchEventResource, batchCode: string): BatchEvent =>
     new BatchEvent({
       id: resource.id,
-      batchCode: resource.batchCode,
-      title: resource.title,
-      detail: resource.detail,
+      batchCode,
+      title: this.titleOf(resource.type),
+      detail: resource.description ?? '',
       occurredAt: resource.occurredAt,
-      tone: resource.tone
+      tone: fromPlatformEnum(resource.tone)
     });
-
-  /**
-   * Converts a BatchEvent entity to a BatchEventResource.
-   * @param entity - The entity to convert.
-   * @returns The converted BatchEventResource.
-   */
-  toResourceFromEntity = (entity: BatchEvent): BatchEventResource =>
-    ({
-      id: entity.id,
-      batchCode: entity.batchCode,
-      title: entity.title,
-      detail: entity.detail,
-      occurredAt: entity.occurredAt,
-      tone: entity.tone
-    } as BatchEventResource);
 }

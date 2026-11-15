@@ -1,6 +1,6 @@
 import {computed, inject, Injectable, Signal, signal, WritableSignal} from '@angular/core';
-import {Observable, retry} from 'rxjs';
-import {ManufacturingApi} from '../infrastructure/manufacturing-api';
+import {Observable, switchMap, tap} from 'rxjs';
+import {BatchWithEvents, ManufacturingApi, OrderWithOperations} from '../infrastructure/manufacturing-api';
 import {Product} from '../domain/model/product.entity';
 import {MasterFormula} from '../domain/model/master-formula.entity';
 import {FormulaItem} from '../domain/model/formula-item.entity';
@@ -33,7 +33,17 @@ export class ManufacturingStore {
   private readonly loadingSignal = signal<boolean>(false);
   private readonly errorSignal = signal<string | null>(null);
 
-  readonly products = this.productsSignal.asReadonly();
+  /**
+   * Products with the version and status of their formula: the approved one, else the last one.
+   */
+  readonly products = computed(() => this.productsSignal().map(product => {
+    const formulas = this.formulasSignal().filter(formula => formula.productCode === product.code);
+    const formula = formulas.find(item => item.status === 'approved') ?? formulas[formulas.length - 1];
+    return new Product({
+      id: product.id, code: product.code, name: product.name, dosageForm: product.dosageForm,
+      formulaVersion: formula?.version ?? '', formulaStatus: formula?.status ?? 'none'
+    });
+  }));
   readonly formulas = this.formulasSignal.asReadonly();
   readonly formulaItems = this.formulaItemsSignal.asReadonly();
   readonly orders = this.ordersSignal.asReadonly();
@@ -58,12 +68,27 @@ export class ManufacturingStore {
    */
   constructor() {
     this.load(this.manufacturingApi.getProducts(), this.productsSignal, 'products');
-    this.load(this.manufacturingApi.getMasterFormulas(), this.formulasSignal, 'master formulas');
-    this.load(this.manufacturingApi.getFormulaItems(), this.formulaItemsSignal, 'formula items');
-    this.load(this.manufacturingApi.getProductionOrders(), this.ordersSignal, 'production orders');
-    this.load(this.manufacturingApi.getOperations(), this.operationsSignal, 'operations');
-    this.load(this.manufacturingApi.getBatches(), this.batchesSignal, 'batches');
-    this.load(this.manufacturingApi.getBatchEvents(), this.batchEventsSignal, 'batch history');
+    this.manufacturingApi.getMasterFormulas().subscribe({
+      next: ({formulas, items}) => {
+        this.formulasSignal.set(formulas);
+        this.formulaItemsSignal.set(items);
+      },
+      error: err => this.errorSignal.set(this.formatError(err, 'Failed to load master formulas'))
+    });
+    // The batches take the codes of their order and product from the orders, so they load after them
+    this.manufacturingApi.getProductionOrders().pipe(
+      tap(orders => {
+        this.ordersSignal.set(orders.map(item => item.order));
+        this.operationsSignal.set(orders.flatMap(item => item.operations));
+      }),
+      switchMap(() => this.manufacturingApi.getBatches(this.ordersSignal()))
+    ).subscribe({
+      next: batches => {
+        this.batchesSignal.set(batches.map(item => item.batch));
+        this.batchEventsSignal.set(batches.flatMap(item => item.events));
+      },
+      error: err => this.errorSignal.set(this.formatError(err, 'Failed to load production orders and batches'))
+    });
     this.load(this.manufacturingApi.getMaterialLots(), this.materialLotsSignal, 'raw materials');
   }
 
@@ -103,7 +128,7 @@ export class ManufacturingStore {
    */
   addProduct = (product: Product): boolean => {
     if (this.products().some(item => item.code.toUpperCase() === product.code.toUpperCase())) return false;
-    this.manufacturingApi.createProduct(product).pipe(retry(2)).subscribe({
+    this.manufacturingApi.createProduct(product).subscribe({
       next: created => this.productsSignal.update(items => [...items, created]),
       error: err => this.errorSignal.set(this.formatError(err, 'Failed to register the product'))
     });
@@ -124,36 +149,35 @@ export class ManufacturingStore {
   };
 
   /**
-   * Creates a planned batch and its production order with the effective master formula.
+   * Creates the production order of a batch with the effective master formula, and then the planned batch.
    * @param batch - Batch to create.
    */
   addBatch = (batch: Batch): void => {
     const formula = this.effectiveFormula(batch.productCode)();
     if (!formula) return;
+    const now = new Date().toISOString();
     this.loadingSignal.set(true);
-    this.manufacturingApi.createBatch(batch).pipe(retry(2)).subscribe({
+    this.manufacturingApi.createProductionOrder(new ProductionOrder({
+      id: 0, code: batch.orderCode, productCode: batch.productCode, formulaId: formula.id, batchCode: batch.code,
+      plannedQuantity: batch.quantity, line: batch.line, status: 'planned', plannedStart: now, plannedEnd: now
+    })).pipe(
+      tap(created => this.replaceOrder(created)),
+      switchMap(created => this.manufacturingApi.createBatch(batch, created.order.id, this.ordersSignal()))
+    ).subscribe({
       next: created => {
-        this.batchesSignal.update(items => [created, ...items]);
+        this.batchesSignal.update(items => [created.batch, ...items]);
+        this.replaceEvents(created);
         this.loadingSignal.set(false);
-        this.addEvent(created.code, 'Created & materials allocated', created.owner, 'normal');
       },
       error: err => {
         this.errorSignal.set(this.formatError(err, 'Failed to create the batch'));
         this.loadingSignal.set(false);
       }
     });
-    this.manufacturingApi.createProductionOrder(new ProductionOrder({
-      id: 0, code: batch.orderCode, productCode: batch.productCode, formulaId: formula.id, batchCode: batch.code,
-      plannedQuantity: batch.quantity, line: batch.line, status: 'planned',
-      plannedStart: new Date().toISOString(), plannedEnd: new Date().toISOString()
-    })).subscribe({
-      next: order => this.ordersSignal.update(items => [...items, order]),
-      error: err => this.errorSignal.set(this.formatError(err, 'Failed to create the production order'))
-    });
   };
 
   /**
-   * Records progress on the next pending operation of an order. Not allowed while an operation is on hold.
+   * Completes the next pending operation of an order. Not allowed while an operation is on hold.
    * @param orderId - Identifier of the order.
    */
   recordOperation = (orderId: number): void => {
@@ -161,29 +185,27 @@ export class ManufacturingStore {
     if (operations.some(operation => operation.status === 'on-hold')) return;
     const next = operations.find(operation => operation.status !== 'complete');
     if (!next) return;
-    next.progress = 100;
-    next.status = 'complete';
-    this.manufacturingApi.updateOperation(next).pipe(retry(2)).subscribe({
-      next: updated => this.operationsSignal.update(items => items.map(item => item.id === updated.id ? updated : item)),
+    this.manufacturingApi.completeOperation(next, next.reference).subscribe({
+      next: updated => this.replaceOrder(updated),
       error: err => this.errorSignal.set(this.formatError(err, 'Failed to record the operation'))
     });
   };
 
   /**
-   * Releases a batch after the QA electronic signature.
+   * Releases a batch whose release was requested, after the QA electronic signature.
    * @param batchCode - Code of the batch.
+   * @param releasedBy - Who signs the release.
    */
-  releaseBatch = (batchCode: string): void => {
+  releaseBatch = (batchCode: string, releasedBy = 'QA electronic signature'): void => {
     const batch = this.batchByCode(batchCode)();
     if (!batch) return;
-    batch.status = 'released';
-    batch.lastActivity = 'Released by QA';
-    batch.lastActivityAt = new Date().toISOString();
-    this.manufacturingApi.updateBatch(batch).pipe(retry(2)).subscribe({
-      next: updated => this.batchesSignal.update(items => items.map(item => item.id === updated.id ? updated : item)),
+    this.manufacturingApi.releaseBatch(batch, releasedBy, this.ordersSignal()).subscribe({
+      next: released => {
+        this.batchesSignal.update(items => items.map(item => item.id === released.batch.id ? released.batch : item));
+        this.replaceEvents(released);
+      },
       error: err => this.errorSignal.set(this.formatError(err, 'Failed to release the batch'))
     });
-    this.addEvent(batchCode, 'Released for distribution', 'QA electronic signature', 'normal');
   };
 
   /**
@@ -192,7 +214,7 @@ export class ManufacturingStore {
    */
   addMaterialLot = (lot: MaterialLot): void => {
     this.loadingSignal.set(true);
-    this.manufacturingApi.createMaterialLot(lot).pipe(retry(2)).subscribe({
+    this.manufacturingApi.createMaterialLot(lot).subscribe({
       next: created => {
         this.materialLotsSignal.update(items => [created, ...items]);
         this.loadingSignal.set(false);
@@ -209,24 +231,32 @@ export class ManufacturingStore {
    * @param lot - Lot to inspect.
    */
   requestInspection = (lot: MaterialLot): void => {
-    lot.samplingStatus = 'requested';
-    lot.status = 'inspection';
-    this.manufacturingApi.updateMaterialLot(lot).pipe(retry(2)).subscribe({
+    this.manufacturingApi.requestInspection(lot).subscribe({
       next: updated => this.materialLotsSignal.update(items => items.map(item => item.id === updated.id ? updated : item)),
       error: err => this.errorSignal.set(this.formatError(err, 'Failed to request the inspection'))
     });
   };
 
   /**
-   * Adds an entry to the status history of a batch.
-   * @param batchCode - Code of the batch.
-   * @param title - What happened.
-   * @param detail - Who or what was involved.
-   * @param tone - Color of the entry.
+   * Puts an order and its operations, as the platform answered them, in place of the ones loaded.
+   * @param updated - The order with its operations.
    */
-  private addEvent(batchCode: string, title: string, detail: string, tone: string): void {
-    this.manufacturingApi.createBatchEvent(new BatchEvent({id: 0, batchCode, title, detail, occurredAt: new Date().toISOString(), tone}))
-      .subscribe({next: event => this.batchEventsSignal.update(items => [...items, event])});
+  private replaceOrder(updated: OrderWithOperations): void {
+    const exists = this.ordersSignal().some(order => order.id === updated.order.id);
+    this.ordersSignal.update(items => exists
+      ? items.map(order => order.id === updated.order.id ? updated.order : order)
+      : [...items, updated.order]);
+    this.operationsSignal.update(items =>
+      [...items.filter(operation => operation.orderId !== updated.order.id), ...updated.operations]);
+  }
+
+  /**
+   * Puts the history of a batch, as the platform answered it, in place of the one loaded.
+   * @param updated - The batch with its events.
+   */
+  private replaceEvents(updated: BatchWithEvents): void {
+    this.batchEventsSignal.update(items =>
+      [...items.filter(event => event.batchCode !== updated.batch.code), ...updated.events]);
   }
 
   /**

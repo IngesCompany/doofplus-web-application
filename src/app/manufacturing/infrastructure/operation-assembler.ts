@@ -1,50 +1,27 @@
-import {BaseAssembler} from '../../shared/infrastructure/base-assembler';
 import {Operation} from '../domain/model/operation.entity';
-import {OperationResource, OperationsResponse} from './operations-response';
+import {OperationResource} from './operations-response';
+import {fromPlatformEnum} from './platform-enum';
 
 /**
- * Maps operation entities to and from API resources.
+ * Maps the operations of a production order of the DoofPlus Platform to operation entities.
  */
-export class OperationAssembler implements BaseAssembler<Operation, OperationResource, OperationsResponse> {
+export class OperationAssembler {
   /**
-   * Converts a OperationsResponse to an array of Operation entities.
-   * @param response - The API response containing operation resources.
-   * @returns An array of Operation entities.
-   */
-  toEntitiesFromResponse = (response: OperationsResponse): Operation[] =>
-    response.operations.map(resource => this.toEntityFromResource(resource));
-
-  /**
-   * Converts a OperationResource to a Operation entity.
-   * @param resource - The resource to convert.
+   * Converts an operation of an order to an Operation entity.
+   * Its identifier is orderId * 1000 + sequence, because the platform identifies it by the order and the sequence.
+   * @param resource - The operation answered inside the order.
+   * @param orderId - Identifier of the order that holds the operation.
    * @returns The converted Operation entity.
    */
-  toEntityFromResource = (resource: OperationResource): Operation =>
+  toEntityFromResource = (resource: OperationResource, orderId: number): Operation =>
     new Operation({
-      id: resource.id,
-      orderId: resource.orderId,
+      id: orderId * 1000 + resource.sequence,
+      orderId,
       sequence: resource.sequence,
       name: resource.name,
-      equipment: resource.equipment,
+      equipment: resource.equipment ?? '',
       progress: resource.progress,
-      status: resource.status,
-      reference: resource.reference
+      status: fromPlatformEnum(resource.status),
+      reference: resource.reference ?? ''
     });
-
-  /**
-   * Converts a Operation entity to a OperationResource.
-   * @param entity - The entity to convert.
-   * @returns The converted OperationResource.
-   */
-  toResourceFromEntity = (entity: Operation): OperationResource =>
-    ({
-      id: entity.id,
-      orderId: entity.orderId,
-      sequence: entity.sequence,
-      name: entity.name,
-      equipment: entity.equipment,
-      progress: entity.progress,
-      status: entity.status,
-      reference: entity.reference
-    } as OperationResource);
 }
