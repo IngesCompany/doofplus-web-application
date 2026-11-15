@@ -1,6 +1,7 @@
 import {BaseAssembler} from '../../shared/infrastructure/base-assembler';
 import {CollaborationTask} from '../domain/model/collaboration-task.entity';
 import {CollaborationTaskResource, CollaborationTasksResponse} from './collaboration-tasks-response';
+import {fromPlatform} from './platform-resource';
 
 /**
  * Maps task entities to and from API resources.
@@ -19,8 +20,9 @@ export class CollaborationTaskAssembler implements BaseAssembler<CollaborationTa
    * @param resource - The resource to convert.
    * @returns The converted CollaborationTask entity.
    */
-  toEntityFromResource = (resource: CollaborationTaskResource): CollaborationTask =>
-    new CollaborationTask({
+  toEntityFromResource = (platformResource: CollaborationTaskResource): CollaborationTask => {
+    const resource = fromPlatform(platformResource, ['status']);
+    return new CollaborationTask({
       id: resource.id,
       title: resource.title,
       recordCode: resource.recordCode,
@@ -29,6 +31,7 @@ export class CollaborationTaskAssembler implements BaseAssembler<CollaborationTa
       dueAt: resource.dueAt,
       status: resource.status
     });
+  };
 
   /**
    * Converts a CollaborationTask entity to a CollaborationTaskResource.

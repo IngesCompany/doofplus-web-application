@@ -1,6 +1,7 @@
 import {BaseAssembler} from '../../shared/infrastructure/base-assembler';
 import {TaskComment} from '../domain/model/task-comment.entity';
 import {TaskCommentResource, TaskCommentsResponse} from './task-comments-response';
+import {fromPlatform} from './platform-resource';
 
 /**
  * Maps comment entities to and from API resources.
@@ -19,8 +20,9 @@ export class TaskCommentAssembler implements BaseAssembler<TaskComment, TaskComm
    * @param resource - The resource to convert.
    * @returns The converted TaskComment entity.
    */
-  toEntityFromResource = (resource: TaskCommentResource): TaskComment =>
-    new TaskComment({
+  toEntityFromResource = (platformResource: TaskCommentResource): TaskComment => {
+    const resource = fromPlatform(platformResource);
+    return new TaskComment({
       id: resource.id,
       recordCode: resource.recordCode,
       author: resource.author,
@@ -28,6 +30,7 @@ export class TaskCommentAssembler implements BaseAssembler<TaskComment, TaskComm
       postedAt: resource.postedAt,
       text: resource.text
     });
+  };
 
   /**
    * Converts a TaskComment entity to a TaskCommentResource.

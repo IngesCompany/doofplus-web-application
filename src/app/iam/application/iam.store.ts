@@ -1,7 +1,8 @@
 import {computed, inject, Injectable, signal} from '@angular/core';
 import {Router} from '@angular/router';
 import {map, Observable, of, retry} from 'rxjs';
-import {IamApi} from '../infrastructure/iam.api';
+import {IamApi, SignInResult} from '../infrastructure/iam.api';
+import {TOKEN_KEY} from '../infrastructure/iam-token.interceptor';
 import {UserAssembler} from '../infrastructure/user-assembler';
 import {UserResource} from '../infrastructure/users-response';
 import {User} from '../domain/model/user.entity';
@@ -34,6 +35,8 @@ export class IamStore {
   private readonly invitationsSignal = signal<Invitation[]>([]);
   private readonly loadingSignal = signal<boolean>(false);
   private readonly errorSignal = signal<string | null>(null);
+  /** Credentials kept in memory between the password step and the two-factor step. */
+  private pendingCredentials: { email: string; password: string } | null = null;
 
   /**
    * User with an active session, or null.
@@ -86,18 +89,23 @@ export class IamStore {
   readonly error = this.errorSignal.asReadonly();
 
   /**
-   * Validates the credentials of the command. A valid user continues to the two-factor step.
+   * Sends the credentials to the DoofPlus Platform. A user with two-factor authentication continues to the
+   * code step; a user without it signs in at once.
    * @param command - Credentials and requested environment.
+   * @param router - Router used to open the workspace when no code is needed.
    */
-  signIn = (command: SignInCommand): void => {
+  signIn = (command: SignInCommand, router?: Router): void => {
     this.loadingSignal.set(true);
-    this.iamApi.findUserByCredentials(command).subscribe({
-      next: user => {
+    this.iamApi.signIn(command.email, command.password).subscribe({
+      next: result => {
         this.loadingSignal.set(false);
-        if (!user) return this.signInStepSignal.set('invalid-credentials');
-        this.pendingUserSignal.set(user);
         this.requestedEnvironmentSignal.set(command.environment);
-        this.signInStepSignal.set('two-factor');
+        if (result.status === 'two-factor-required') {
+          this.pendingCredentials = {email: command.email, password: command.password};
+          this.pendingUserSignal.set(this.pendingUserFromEmail(command.email));
+          return this.signInStepSignal.set('two-factor');
+        }
+        this.completeSignIn(result, router);
       },
       error: err => {
         this.loadingSignal.set(false);
@@ -107,31 +115,63 @@ export class IamStore {
   };
 
   /**
-   * Checks the two-factor code. Once the identity is verified, the session opens only if the user's role
-   * belongs to the requested environment; otherwise the user is not authorized.
+   * Sends the two-factor code with the credentials of the first step. The DoofPlus Platform answers the user
+   * and its JWT only when the code is right.
    * @param code - Six-digit code from the authenticator app.
-   * @param router - Router used to open the workspace.
+   * @param router - Router used to open the workspace of the user.
    */
   verifyTwoFactorCode = (code: string, router: Router): void => {
-    const user = this.pendingUser();
-    if (!user) return this.signInStepSignal.set('credentials');
-    this.iamApi.verifyTwoFactorCode(user.id, code).subscribe({
-      next: valid => {
-        if (!valid) return this.signInStepSignal.set('invalid-code');
-        if (user.environment !== this.requestedEnvironmentSignal()) return this.signInStepSignal.set('not-authorized');
-        this.currentUserSignal.set(user);
-        localStorage.setItem(SESSION_KEY, JSON.stringify(this.userAssembler.toResourceFromEntity(user)));
-        this.resetSignIn();
-        router.navigate([workspaceEnvironments[user.environment as WorkspaceEnvironment].navigation[0].link]).then();
-      },
+    const credentials = this.pendingCredentials;
+    if (!credentials) return this.signInStepSignal.set('credentials');
+    this.iamApi.signIn(credentials.email, credentials.password, code).subscribe({
+      next: result => this.completeSignIn(result, router),
       error: err => this.errorSignal.set(this.formatError(err, 'Failed to verify the code'))
     });
   };
 
   /**
+   * Opens the session when the platform signed the user in, or moves the form to the step of the failure.
+   * @param result - Outcome of the sign-in request.
+   * @param router - Router used to open the workspace of the user.
+   */
+  private completeSignIn(result: SignInResult, router?: Router): void {
+    if (result.status === 'invalid-two-factor-code') return this.signInStepSignal.set('invalid-code');
+    if (result.status !== 'signed-in') {
+      this.pendingCredentials = null;
+      return this.signInStepSignal.set('invalid-credentials');
+    }
+    const user = result.user;
+    if (user.environment !== this.requestedEnvironmentSignal()) {
+      this.pendingCredentials = null;
+      this.pendingUserSignal.set(user);
+      return this.signInStepSignal.set('not-authorized');
+    }
+    this.currentUserSignal.set(user);
+    localStorage.setItem(SESSION_KEY, JSON.stringify(this.userAssembler.toResourceFromEntity(user)));
+    localStorage.setItem(TOKEN_KEY, result.token);
+    this.resetSignIn();
+    router?.navigate([workspaceEnvironments[user.environment as WorkspaceEnvironment].navigation[0].link]).then();
+  }
+
+  /**
+   * Builds the user shown in the two-factor step: the platform reveals the account only after the code.
+   * @param email - Work email entered by the user.
+   * @returns A user with the email and a name taken from it (maria.mexico becomes Maria Mexico).
+   */
+  private pendingUserFromEmail(email: string): User {
+    const fullName = email.split('@')[0].split(/[._-]+/).filter(Boolean)
+      .map(part => part[0].toUpperCase() + part.slice(1)).join(' ');
+    return new User({
+      id: 0, fullName, initials: '', email, role: '', environment: '', facility: '', status: '',
+      organizationId: 0, organizationName: '', plant: '', privilege: ''
+    });
+  }
+
+  /**
    * Returns the sign-in flow to the credentials step.
    */
   resetSignIn = (): void => {
+    this.pendingCredentials = null;
     this.pendingUserSignal.set(null);
     this.requestedEnvironmentSignal.set(null);
     this.signInStepSignal.set('credentials');
@@ -143,6 +183,7 @@ export class IamStore {
    */
   signOut = (router: Router): void => {
     localStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem(TOKEN_KEY);
     this.currentUserSignal.set(null);
     this.resetSignIn();
     router.navigate(['/sign-in']).then();
@@ -195,8 +236,10 @@ export class IamStore {
   verifyPassword = (password: string): Observable<boolean> => {
     const user = this.currentUser();
     if (!user) return of(false);
-    return this.iamApi.findUserByCredentials(new SignInCommand({email: user.email, password, environment: user.environment as WorkspaceEnvironment}))
-      .pipe(map(found => found?.id === user.id));
+    // The platform answers two-factor-required only after it checked the password.
+    return this.iamApi.signIn(user.email, password).pipe(
+      map(result => result.status === 'signed-in' || result.status === 'two-factor-required')
+    );
   };
 
   /**

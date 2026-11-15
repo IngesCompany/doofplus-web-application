@@ -113,9 +113,12 @@
                 } @else {
                   <span class="chip chip-success">{{ 'quality.evidence-status.' + item.status | translate }}</span>
                 }
-                <button mat-icon-button color="warn" type="button" (click)="removeEvidence(item)" aria-label="Delete evidence">
-                  <mat-icon>delete</mat-icon>
-                </button>
+                @if (item.status !== 'reviewed') {
+                  <button mat-icon-button color="warn" type="button" (click)="removeEvidence(item)"
+                          [attr.aria-label]="'quality.deviations.remove-evidence' | translate">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                }
               </div>
             </div>
           }

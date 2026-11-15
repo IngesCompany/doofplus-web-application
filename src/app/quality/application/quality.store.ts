@@ -237,12 +237,20 @@ export class QualityStore {
   };
 
   /**
-   * Removes a piece of evidence.
+   * Removes evidence attached by mistake. Reviewed evidence cannot be removed, so the investigation keeps its integrity.
    * @param evidence - Evidence to delete.
+   * @returns False when the evidence was already reviewed.
    */
-  deleteEvidence = (evidence: Evidence): void => {
-    this.evidenceSignal.update((items) => items.filter((item) => item.id !== evidence.id));
-    this.log('Evidence removed', evidence.recordCode, 'Deleted');
+  deleteEvidence = (evidence: Evidence): boolean => {
+    if (evidence.status === 'reviewed') return false;
+    this.qualityApi.deleteEvidence(evidence).subscribe({
+      next: () => {
+        this.evidenceSignal.update((items) => items.filter((item) => item.id !== evidence.id));
+        this.log('Evidence removed', evidence.recordCode, 'Deleted');
+      },
+      error: (err) => this.errorSignal.set(this.formatError(err, 'Failed to remove the evidence')),
+    });
+    return true;
   };
 
   /**
@@ -420,7 +428,7 @@ export class QualityStore {
     if (this.releaseChecks(batchCode).some((check) => !check.passed)) return done('not-ready');
     this.iamStore.verifyPassword(password).subscribe((valid) => {
       if (!valid) return done('invalid-password');
-      this.manufacturingStore.releaseBatch(batchCode);
+      this.manufacturingStore.releaseBatch(batchCode, this.iamStore.currentUser()?.fullName);
       this.log('Batch released (electronic signature)', batchCode, 'Released');
       done('released');
     });

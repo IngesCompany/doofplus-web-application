@@ -1,20 +1,31 @@
 import {inject, Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {Observable, map} from 'rxjs';
+import {HttpClient, HttpErrorResponse} from '@angular/common/http';
+import {Observable, catchError, map, of, throwError} from 'rxjs';
 import {BaseApi} from '../../shared/infrastructure/base-api';
 import {environment} from '../../../environments/environment';
 import {User} from '../domain/model/user.entity';
 import {RoleProfile} from '../domain/model/role-profile.entity';
 import {Invitation} from '../domain/model/invitation.entity';
-import {SignInCommand} from '../domain/model/sign-in.command';
 import {UsersApiEndpoint} from './users-api-endpoint';
 import {RoleProfilesApiEndpoint} from './role-profiles-api-endpoint';
 import {InvitationsApiEndpoint} from './invitations-api-endpoint';
-import {UserResource} from './users-response';
+import {AuthenticatedUserResource, UserResource} from './users-response';
 import {UserAssembler} from './user-assembler';
 
 /**
+ * Outcome of a sign-in request to the DoofPlus Platform.
+ * The platform answers 401 with the reason in the details of the problem: invalid-credentials,
+ * two-factor-required (the password is right; send the code in a second request) or invalid-two-factor-code.
+ */
+export type SignInResult =
+  | { status: 'signed-in'; user: User; token: string }
+  | { status: 'two-factor-required' }
+  | { status: 'invalid-credentials' }
+  | { status: 'invalid-two-factor-code' };
+
+/**
  * Infrastructure facade for the IAM endpoints: authentication, users, profiles and invitations.
+ * Sign-in, sign-up and users use the DoofPlus Platform; profiles and invitations still use the fake API.
  */
 @Injectable({providedIn: 'root'})
 export class IamApi extends BaseApi {
@@ -22,45 +33,48 @@ export class IamApi extends BaseApi {
   private readonly usersEndpoint = new UsersApiEndpoint(this.http);
   private readonly roleProfilesEndpoint = new RoleProfilesApiEndpoint(this.http);
   private readonly invitationsEndpoint = new InvitationsApiEndpoint(this.http);
-  private readonly usersUrl = `${environment.fakeApiBaseUrl}${environment.platformProviderUsersEndpointPath}`;
+  private readonly signInUrl = `${environment.platformProviderApiBaseUrl}${environment.platformProviderSignInEndpointPath}`;
+  private readonly signUpUrl = `${environment.platformProviderApiBaseUrl}${environment.platformProviderSignUpEndpointPath}`;
   private readonly userAssembler = new UserAssembler();
 
   /**
-   * Finds the user that matches the credentials of the command.
-   * @param command - Email and password entered by the user.
-   * @returns Stream with the user, or undefined when the credentials are invalid.
-   * @remarks The fake API filters users by query parameters; the DoofPlus Platform will expose a sign-in endpoint.
+   * Signs in with the DoofPlus Platform.
+   * @param email - Work email of the user.
+   * @param password - Password of the user.
+   * @param twoFactorCode - Six-digit code of the authenticator app; omitted in the first step.
+   * @returns Stream with the outcome; the user and its JWT when the sign-in succeeds.
    */
-  findUserByCredentials = (command: SignInCommand): Observable<User | undefined> =>
-    this.http.get<UserResource[]>(this.usersUrl, {params: {email: command.email, password: command.password}}).pipe(
-      map(resources => resources.length ? this.userAssembler.toEntityFromResource(resources[0]) : undefined)
+  signIn = (email: string, password: string, twoFactorCode?: string): Observable<SignInResult> =>
+    this.http.post<AuthenticatedUserResource>(this.signInUrl, {email, password, twoFactorCode: twoFactorCode ?? null}).pipe(
+      map(resource => ({
+        status: 'signed-in' as const,
+        user: this.userAssembler.toEntityFromResource(resource),
+        token: resource.token
+      })),
+      catchError((error: unknown) => {
+        if (error instanceof HttpErrorResponse && error.status === 401) {
+          const reason = error.error?.details ?? error.error?.detail;
+          if (reason === 'two-factor-required') return of({status: 'two-factor-required' as const});
+          if (reason === 'invalid-two-factor-code') return of({status: 'invalid-two-factor-code' as const});
+          return of({status: 'invalid-credentials' as const});
+        }
+        return throwError(() => new Error('Failed to sign in'));
+      })
     );
 
   /**
-   * Checks the two-factor code of a user.
-   * @param userId - Identifier of the user that is signing in.
-   * @param code - Six-digit code from the authenticator app.
-   * @returns Stream that emits true when the code is valid.
-   */
-  verifyTwoFactorCode = (userId: number, code: string): Observable<boolean> =>
-    this.http.get<UserResource[]>(this.usersUrl, {params: {id: userId, twoFactorCode: code}}).pipe(
-      map(resources => resources.length > 0)
-    );
-
-  /**
-   * Creates a user account with its password.
+   * Creates a user account with its password in the DoofPlus Platform, which stores it hashed.
    * @param user - The user to create.
    * @param password - Initial password chosen by the user.
    * @returns Stream with the created user.
-   * @remarks The fake API stores the password with the user; the DoofPlus Platform will hash it in a sign-up endpoint.
    */
   createUser = (user: User, password: string): Observable<User> =>
-    this.http.post<UserResource>(this.usersUrl, {...this.userAssembler.toResourceFromEntity(user), id: undefined, password}).pipe(
+    this.http.post<UserResource>(this.signUpUrl, {...this.userAssembler.toResourceFromEntity(user), id: undefined, password}).pipe(
       map(resource => this.userAssembler.toEntityFromResource(resource))
     );
 
   /**
-   * Retrieves all users of the organization.
+   * Retrieves all users of the platform (only administrators receive them).
    * @returns Stream with the user collection.
    */
   getUsers = (): Observable<User[]> => this.usersEndpoint.getAll();

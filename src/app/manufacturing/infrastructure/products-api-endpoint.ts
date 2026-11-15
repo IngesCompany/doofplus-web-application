@@ -6,7 +6,7 @@ import {ProductResource, ProductsResponse} from './products-response';
 import {ProductAssembler} from './product-assembler';
 
 /**
- * Endpoint client for product CRUD operations.
+ * Endpoint client for the products of the DoofPlus Platform.
  */
 export class ProductsApiEndpoint extends BaseApiEndpoint<Product, ProductResource, ProductsResponse, ProductAssembler> {
   /**
@@ -14,6 +14,6 @@ export class ProductsApiEndpoint extends BaseApiEndpoint<Product, ProductResourc
    * @param http - The HttpClient to be used for making API requests.
    */
   constructor(http: HttpClient) {
-    super(http, `${environment.fakeApiBaseUrl}${environment.platformProviderProductsEndpointPath}`, new ProductAssembler());
+    super(http, `${environment.platformProviderApiBaseUrl}${environment.platformProviderProductsEndpointPath}`, new ProductAssembler());
   }
 }

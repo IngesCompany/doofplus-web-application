@@ -1,14 +1,15 @@
 import {BaseAssembler} from '../../shared/infrastructure/base-assembler';
 import {MaterialLot} from '../domain/model/material-lot.entity';
 import {MaterialLotResource, MaterialLotsResponse} from './material-lots-response';
+import {fromPlatformEnum} from './platform-enum';
 
 /**
- * Maps material lot entities to and from API resources.
+ * Maps raw material lot entities to and from the resources of the DoofPlus Platform.
  */
 export class MaterialLotAssembler implements BaseAssembler<MaterialLot, MaterialLotResource, MaterialLotsResponse> {
   /**
    * Converts a MaterialLotsResponse to an array of MaterialLot entities.
-   * @param response - The API response containing material lot resources.
+   * @param response - The API response containing raw material lot resources.
    * @returns An array of MaterialLot entities.
    */
   toEntitiesFromResponse = (response: MaterialLotsResponse): MaterialLot[] =>
@@ -23,26 +24,26 @@ export class MaterialLotAssembler implements BaseAssembler<MaterialLot, Material
     new MaterialLot({
       id: resource.id,
       code: resource.code,
-      receiptCode: resource.receiptCode,
+      receiptCode: resource.receiptCode ?? '',
       material: resource.material,
-      category: resource.category,
-      supplier: resource.supplier,
-      supplierLot: resource.supplierLot,
-      quantity: resource.quantity,
-      expiryDate: resource.expiryDate,
-      storageLocation: resource.storageLocation,
-      certificate: resource.certificate,
-      status: resource.status,
+      category: fromPlatformEnum(resource.category),
+      supplier: resource.supplier ?? '',
+      supplierLot: resource.supplierLot ?? '',
+      quantity: resource.quantity ?? '',
+      expiryDate: resource.expiryDate ?? '',
+      storageLocation: resource.storageLocation ?? '',
+      certificate: resource.certificate ?? '',
+      status: fromPlatformEnum(resource.status),
       packagingVerified: resource.packagingVerified,
       identityVerified: resource.identityVerified,
-      samplingStatus: resource.samplingStatus,
-      allocatedBatch: resource.allocatedBatch
+      samplingStatus: fromPlatformEnum(resource.samplingStatus),
+      allocatedBatch: resource.allocatedBatch ?? ''
     });
 
   /**
-   * Converts a MaterialLot entity to a MaterialLotResource.
+   * Converts a MaterialLot entity to the body that registers its receipt.
    * @param entity - The entity to convert.
-   * @returns The converted MaterialLotResource.
+   * @returns The converted resource.
    */
   toResourceFromEntity = (entity: MaterialLot): MaterialLotResource =>
     ({
@@ -56,11 +57,6 @@ export class MaterialLotAssembler implements BaseAssembler<MaterialLot, Material
       quantity: entity.quantity,
       expiryDate: entity.expiryDate,
       storageLocation: entity.storageLocation,
-      certificate: entity.certificate,
-      status: entity.status,
-      packagingVerified: entity.packagingVerified,
-      identityVerified: entity.identityVerified,
-      samplingStatus: entity.samplingStatus,
-      allocatedBatch: entity.allocatedBatch
+      certificate: entity.certificate
     } as MaterialLotResource);
 }

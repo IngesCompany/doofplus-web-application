@@ -1,6 +1,7 @@
 import {BaseAssembler} from '../../shared/infrastructure/base-assembler';
 import {AnalyticalResult} from '../domain/model/analytical-result.entity';
 import {AnalyticalResultResource, AnalyticalResultsResponse} from './analytical-results-response';
+import {fromPlatform} from './platform-resource';
 
 /**
  * Maps analytical result entities to and from API resources.
@@ -19,8 +20,9 @@ export class AnalyticalResultAssembler implements BaseAssembler<AnalyticalResult
    * @param resource - The resource to convert.
    * @returns The converted AnalyticalResult entity.
    */
-  toEntityFromResource = (resource: AnalyticalResultResource): AnalyticalResult =>
-    new AnalyticalResult({
+  toEntityFromResource = (platformResource: AnalyticalResultResource): AnalyticalResult => {
+    const resource = fromPlatform(platformResource, ['status', 'approval']);
+    return new AnalyticalResult({
       id: resource.id,
       batchCode: resource.batchCode,
       sampleCode: resource.sampleCode,
@@ -33,6 +35,7 @@ export class AnalyticalResultAssembler implements BaseAssembler<AnalyticalResult
       status: resource.status,
       approval: resource.approval
     });
+  };
 
   /**
    * Converts a AnalyticalResult entity to a AnalyticalResultResource.

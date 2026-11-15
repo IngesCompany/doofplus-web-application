@@ -1,6 +1,7 @@
 import {BaseAssembler} from '../../shared/infrastructure/base-assembler';
 import {TraceabilityGap} from '../domain/model/traceability-gap.entity';
 import {TraceabilityGapResource, TraceabilityGapsResponse} from './traceability-gaps-response';
+import {fromPlatform} from './platform-resource';
 
 /**
  * Maps traceability gap entities to and from API resources.
@@ -19,14 +20,16 @@ export class TraceabilityGapAssembler implements BaseAssembler<TraceabilityGap, 
    * @param resource - The resource to convert.
    * @returns The converted TraceabilityGap entity.
    */
-  toEntityFromResource = (resource: TraceabilityGapResource): TraceabilityGap =>
-    new TraceabilityGap({
+  toEntityFromResource = (platformResource: TraceabilityGapResource): TraceabilityGap => {
+    const resource = fromPlatform(platformResource);
+    return new TraceabilityGap({
       id: resource.id,
       batchCode: resource.batchCode,
       product: resource.product,
       missingRecord: resource.missingRecord,
       detail: resource.detail
     });
+  };
 
   /**
    * Converts a TraceabilityGap entity to a TraceabilityGapResource.

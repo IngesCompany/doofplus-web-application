@@ -1,9 +1,11 @@
 import {BaseAssembler} from '../../shared/infrastructure/base-assembler';
 import {Product} from '../domain/model/product.entity';
 import {ProductResource, ProductsResponse} from './products-response';
+import {fromPlatformEnum} from './platform-enum';
 
 /**
- * Maps product entities to and from API resources.
+ * Maps product entities to and from the resources of the DoofPlus Platform.
+ * The platform does not answer the formula of the product; the store completes it from the master formulas.
  */
 export class ProductAssembler implements BaseAssembler<Product, ProductResource, ProductsResponse> {
   /**
@@ -15,7 +17,7 @@ export class ProductAssembler implements BaseAssembler<Product, ProductResource,
     response.products.map(resource => this.toEntityFromResource(resource));
 
   /**
-   * Converts a ProductResource to a Product entity.
+   * Converts a ProductResource to a Product entity without formula.
    * @param resource - The resource to convert.
    * @returns The converted Product entity.
    */
@@ -24,23 +26,16 @@ export class ProductAssembler implements BaseAssembler<Product, ProductResource,
       id: resource.id,
       code: resource.code,
       name: resource.name,
-      dosageForm: resource.dosageForm,
-      formulaVersion: resource.formulaVersion,
-      formulaStatus: resource.formulaStatus
+      dosageForm: fromPlatformEnum(resource.dosageForm),
+      formulaVersion: 'none',
+      formulaStatus: 'none'
     });
 
   /**
-   * Converts a Product entity to a ProductResource.
+   * Converts a Product entity to the body that registers it.
    * @param entity - The entity to convert.
-   * @returns The converted ProductResource.
+   * @returns The resource with the code, the name and the dosage form.
    */
   toResourceFromEntity = (entity: Product): ProductResource =>
-    ({
-      id: entity.id,
-      code: entity.code,
-      name: entity.name,
-      dosageForm: entity.dosageForm,
-      formulaVersion: entity.formulaVersion,
-      formulaStatus: entity.formulaStatus
-    } as ProductResource);
+    ({id: entity.id, code: entity.code, name: entity.name, dosageForm: entity.dosageForm} as ProductResource);
 }
