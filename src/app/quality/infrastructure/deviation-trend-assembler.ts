@@ -1,6 +1,7 @@
 import {BaseAssembler} from '../../shared/infrastructure/base-assembler';
 import {DeviationTrend} from '../domain/model/deviation-trend.entity';
 import {DeviationTrendResource, DeviationTrendsResponse} from './deviation-trends-response';
+import {fromPlatform} from './platform-resource';
 
 /**
  * Maps deviation trend entities to and from API resources.
@@ -19,13 +20,15 @@ export class DeviationTrendAssembler implements BaseAssembler<DeviationTrend, De
    * @param resource - The resource to convert.
    * @returns The converted DeviationTrend entity.
    */
-  toEntityFromResource = (resource: DeviationTrendResource): DeviationTrend =>
-    new DeviationTrend({
+  toEntityFromResource = (platformResource: DeviationTrendResource): DeviationTrend => {
+    const resource = fromPlatform(platformResource);
+    return new DeviationTrend({
       id: resource.id,
       rootCause: resource.rootCause,
       month: resource.month,
       count: resource.count
     });
+  };
 
   /**
    * Converts a DeviationTrend entity to a DeviationTrendResource.

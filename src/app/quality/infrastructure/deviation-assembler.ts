@@ -1,6 +1,7 @@
 import {BaseAssembler} from '../../shared/infrastructure/base-assembler';
 import {Deviation} from '../domain/model/deviation.entity';
 import {DeviationResource, DeviationsResponse} from './deviations-response';
+import {fromPlatform} from './platform-resource';
 
 /**
  * Maps deviation entities to and from API resources.
@@ -19,8 +20,9 @@ export class DeviationAssembler implements BaseAssembler<Deviation, DeviationRes
    * @param resource - The resource to convert.
    * @returns The converted Deviation entity.
    */
-  toEntityFromResource = (resource: DeviationResource): Deviation =>
-    new Deviation({
+  toEntityFromResource = (platformResource: DeviationResource): Deviation => {
+    const resource = fromPlatform(platformResource, ['classification', 'status']);
+    return new Deviation({
       id: resource.id,
       code: resource.code,
       title: resource.title,
@@ -40,6 +42,7 @@ export class DeviationAssembler implements BaseAssembler<Deviation, DeviationRes
       owner: resource.owner,
       dueAt: resource.dueAt
     });
+  };
 
   /**
    * Converts a Deviation entity to a DeviationResource.

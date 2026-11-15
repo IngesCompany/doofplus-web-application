@@ -1,6 +1,7 @@
 import {BaseAssembler} from '../../shared/infrastructure/base-assembler';
 import {QualityDocument} from '../domain/model/quality-document.entity';
 import {QualityDocumentResource, QualityDocumentsResponse} from './quality-documents-response';
+import {fromPlatform} from './platform-resource';
 
 /**
  * Maps quality document entities to and from API resources.
@@ -19,8 +20,9 @@ export class QualityDocumentAssembler implements BaseAssembler<QualityDocument, 
    * @param resource - The resource to convert.
    * @returns The converted QualityDocument entity.
    */
-  toEntityFromResource = (resource: QualityDocumentResource): QualityDocument =>
-    new QualityDocument({
+  toEntityFromResource = (platformResource: QualityDocumentResource): QualityDocument => {
+    const resource = fromPlatform(platformResource, ['status']);
+    return new QualityDocument({
       id: resource.id,
       code: resource.code,
       title: resource.title,
@@ -36,6 +38,7 @@ export class QualityDocumentAssembler implements BaseAssembler<QualityDocument, 
       revisionSummary: resource.revisionSummary,
       reviewCycleMonths: resource.reviewCycleMonths
     });
+  };
 
   /**
    * Converts a QualityDocument entity to a QualityDocumentResource.

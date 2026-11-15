@@ -1,6 +1,7 @@
 import {BaseAssembler} from '../../shared/infrastructure/base-assembler';
 import {CapaAction} from '../domain/model/capa-action.entity';
 import {CapaActionResource, CapaActionsResponse} from './capa-actions-response';
+import {fromPlatform} from './platform-resource';
 
 /**
  * Maps CAPA action entities to and from API resources.
@@ -19,8 +20,9 @@ export class CapaActionAssembler implements BaseAssembler<CapaAction, CapaAction
    * @param resource - The resource to convert.
    * @returns The converted CapaAction entity.
    */
-  toEntityFromResource = (resource: CapaActionResource): CapaAction =>
-    new CapaAction({
+  toEntityFromResource = (platformResource: CapaActionResource): CapaAction => {
+    const resource = fromPlatform(platformResource, ['status']);
+    return new CapaAction({
       id: resource.id,
       capaCode: resource.capaCode,
       code: resource.code,
@@ -31,6 +33,7 @@ export class CapaActionAssembler implements BaseAssembler<CapaAction, CapaAction
       evidence: resource.evidence,
       evidenceAttached: resource.evidenceAttached
     });
+  };
 
   /**
    * Converts a CapaAction entity to a CapaActionResource.

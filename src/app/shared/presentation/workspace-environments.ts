@@ -89,7 +89,7 @@ export const workspaceEnvironments: Record<WorkspaceEnvironment, EnvironmentProf
       { link: '/qa/tasks', label: 'nav.tasks' }
     ],
     search: [
-      { url: `${environment.fakeApiBaseUrl}${environment.platformProviderQualityDocumentsEndpointPath}`, route: '/qa/documents?code={code}' },
+      { url: `${environment.platformProviderApiBaseUrl}${environment.platformProviderQualityDocumentsEndpointPath}`, route: '/qa/documents?code={code}' },
       { url: `${environment.platformProviderApiBaseUrl}${environment.platformProviderProductionBatchesEndpointPath}`, route: '/qa/batch-release?code={code}', codeField: 'batchNumber' }
     ],
     searchExample: 'SOP-QA-014'

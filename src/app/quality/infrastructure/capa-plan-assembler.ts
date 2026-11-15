@@ -1,6 +1,7 @@
 import {BaseAssembler} from '../../shared/infrastructure/base-assembler';
 import {CapaPlan} from '../domain/model/capa-plan.entity';
 import {CapaPlanResource, CapaPlansResponse} from './capa-plans-response';
+import {fromPlatform} from './platform-resource';
 
 /**
  * Maps CAPA plan entities to and from API resources.
@@ -19,8 +20,9 @@ export class CapaPlanAssembler implements BaseAssembler<CapaPlan, CapaPlanResour
    * @param resource - The resource to convert.
    * @returns The converted CapaPlan entity.
    */
-  toEntityFromResource = (resource: CapaPlanResource): CapaPlan =>
-    new CapaPlan({
+  toEntityFromResource = (platformResource: CapaPlanResource): CapaPlan => {
+    const resource = fromPlatform(platformResource, ['status']);
+    return new CapaPlan({
       id: resource.id,
       code: resource.code,
       title: resource.title,
@@ -32,6 +34,7 @@ export class CapaPlanAssembler implements BaseAssembler<CapaPlan, CapaPlanResour
       effectivenessCheckAt: resource.effectivenessCheckAt,
       status: resource.status
     });
+  };
 
   /**
    * Converts a CapaPlan entity to a CapaPlanResource.

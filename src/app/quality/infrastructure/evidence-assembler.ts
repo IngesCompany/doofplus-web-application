@@ -1,6 +1,7 @@
 import {BaseAssembler} from '../../shared/infrastructure/base-assembler';
 import {Evidence} from '../domain/model/evidence.entity';
 import {EvidenceResource, EvidenceResponse} from './evidence-response';
+import {fromPlatform} from './platform-resource';
 
 /**
  * Maps evidence entities to and from API resources.
@@ -19,14 +20,16 @@ export class EvidenceAssembler implements BaseAssembler<Evidence, EvidenceResour
    * @param resource - The resource to convert.
    * @returns The converted Evidence entity.
    */
-  toEntityFromResource = (resource: EvidenceResource): Evidence =>
-    new Evidence({
+  toEntityFromResource = (platformResource: EvidenceResource): Evidence => {
+    const resource = fromPlatform(platformResource, ['status']);
+    return new Evidence({
       id: resource.id,
       recordCode: resource.recordCode,
       fileName: resource.fileName,
       detail: resource.detail,
       status: resource.status
     });
+  };
 
   /**
    * Converts a Evidence entity to a EvidenceResource.

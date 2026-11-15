@@ -1,6 +1,7 @@
 import {BaseAssembler} from '../../shared/infrastructure/base-assembler';
 import {AuditEvent} from '../domain/model/audit-event.entity';
 import {AuditEventResource, AuditEventsResponse} from './audit-events-response';
+import {fromPlatform} from './platform-resource';
 
 /**
  * Maps audit event entities to and from API resources.
@@ -19,8 +20,9 @@ export class AuditEventAssembler implements BaseAssembler<AuditEvent, AuditEvent
    * @param resource - The resource to convert.
    * @returns The converted AuditEvent entity.
    */
-  toEntityFromResource = (resource: AuditEventResource): AuditEvent =>
-    new AuditEvent({
+  toEntityFromResource = (platformResource: AuditEventResource): AuditEvent => {
+    const resource = fromPlatform(platformResource);
+    return new AuditEvent({
       id: resource.id,
       eventCode: resource.eventCode,
       occurredAt: resource.occurredAt,
@@ -34,6 +36,7 @@ export class AuditEventAssembler implements BaseAssembler<AuditEvent, AuditEvent
       after: resource.after,
       reason: resource.reason
     });
+  };
 
   /**
    * Converts a AuditEvent entity to a AuditEventResource.
