@@ -31,6 +31,10 @@ export interface SearchTarget {
    * Route that opens the record; `{code}` is replaced by the code found.
    */
   route: string;
+  /**
+   * Field of the record that holds its code; `code` when omitted.
+   */
+  codeField?: string;
 }
 
 /**
@@ -86,7 +90,7 @@ export const workspaceEnvironments: Record<WorkspaceEnvironment, EnvironmentProf
     ],
     search: [
       { url: `${environment.fakeApiBaseUrl}${environment.platformProviderQualityDocumentsEndpointPath}`, route: '/qa/documents?code={code}' },
-      { url: `${environment.fakeApiBaseUrl}${environment.platformProviderBatchesEndpointPath}`, route: '/qa/batch-release?code={code}' }
+      { url: `${environment.platformProviderApiBaseUrl}${environment.platformProviderProductionBatchesEndpointPath}`, route: '/qa/batch-release?code={code}', codeField: 'batchNumber' }
     ],
     searchExample: 'SOP-QA-014'
   },
@@ -106,8 +110,8 @@ export const workspaceEnvironments: Record<WorkspaceEnvironment, EnvironmentProf
       { link: '/production/tasks', label: 'nav.tasks' }
     ],
     search: [
-      { url: `${environment.fakeApiBaseUrl}${environment.platformProviderBatchesEndpointPath}`, route: '/production/batches/{code}' },
-      { url: `${environment.fakeApiBaseUrl}${environment.platformProviderProductionOrdersEndpointPath}`, route: '/production/orders/{code}' },
+      { url: `${environment.platformProviderApiBaseUrl}${environment.platformProviderProductionBatchesEndpointPath}`, route: '/production/batches/{code}', codeField: 'batchNumber' },
+      { url: `${environment.platformProviderApiBaseUrl}${environment.platformProviderProductionOrdersEndpointPath}`, route: '/production/orders/{code}' },
       { url: `${environment.platformProviderApiBaseUrl}${environment.platformProviderSensorsEndpointPath}`, route: '/production/sensors/{code}' }
     ],
     searchExample: 'B-26041'

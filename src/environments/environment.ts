@@ -1,8 +1,8 @@
 export const environment = {
   production: true,
-  // DoofPlus Platform (RESTful Web Services) published on Render: IAM (sign-in, sign-up, users), Organizations and IoT Monitoring
+  // DoofPlus Platform (RESTful Web Services) published on Render: IAM (sign-in, sign-up, users), Organizations, IoT Monitoring and Manufacturing
   platformProviderApiBaseUrl: 'https://doofplus-platform.onrender.com/api/v1',
-  // Fake API (json-server) published on Render for the resources not connected yet: IAM profiles and invitations, Manufacturing, Quality and Subscriptions
+  // Fake API (json-server) published on Render for the resources not connected yet: IAM profiles and invitations, Quality and Subscriptions
   fakeApiBaseUrl: 'https://ingescompany-frontend.onrender.com/api/v1',
   platformProviderQualityDocumentsEndpointPath: '/quality-documents',
   platformProviderDeviationsEndpointPath: '/deviations',
@@ -33,11 +33,8 @@ export const environment = {
   platformProviderInvitationsEndpointPath: '/invitations',
   platformProviderProductsEndpointPath: '/products',
   platformProviderMasterFormulasEndpointPath: '/master-formulas',
-  platformProviderFormulaItemsEndpointPath: '/formula-items',
   platformProviderProductionOrdersEndpointPath: '/production-orders',
-  platformProviderOperationsEndpointPath: '/operations',
-  platformProviderBatchesEndpointPath: '/batches',
-  platformProviderBatchEventsEndpointPath: '/batch-events',
+  platformProviderProductionBatchesEndpointPath: '/production-batches',
   platformProviderMaterialLotsEndpointPath: '/material-lots',
   platformProviderEquipmentEndpointPath: '/equipment',
   platformProviderSensorsEndpointPath: '/sensors',

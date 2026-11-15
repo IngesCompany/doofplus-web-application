@@ -1,58 +1,41 @@
-import {BaseAssembler} from '../../shared/infrastructure/base-assembler';
 import {Batch} from '../domain/model/batch.entity';
-import {BatchResource, BatchesResponse} from './batch-response';
+import {ProductionOrder} from '../domain/model/production-order.entity';
+import {ProductionBatchResource} from './production-batches-response';
+import {BatchEventAssembler} from './batch-event-assembler';
+import {fromPlatformEnum} from './platform-enum';
 
 /**
- * Maps batch entities to and from API resources.
+ * Maps the production batches of the DoofPlus Platform to batch entities.
+ * The codes of the order and the product come from the production order of the batch.
  */
-export class BatchAssembler implements BaseAssembler<Batch, BatchResource, BatchesResponse> {
-  /**
-   * Converts a BatchesResponse to an array of Batch entities.
-   * @param response - The API response containing batch resources.
-   * @returns An array of Batch entities.
-   */
-  toEntitiesFromResponse = (response: BatchesResponse): Batch[] =>
-    response.batches.map(resource => this.toEntityFromResource(resource));
+export class BatchAssembler {
+  private readonly eventAssembler = new BatchEventAssembler();
 
   /**
-   * Converts a BatchResource to a Batch entity.
-   * @param resource - The resource to convert.
+   * Converts a production batch to a Batch entity.
+   * The incident is the last one not resolved; the last activity is the last event of the batch.
+   * @param resource - The batch answered by the platform.
+   * @param orders - Production orders already loaded.
    * @returns The converted Batch entity.
    */
-  toEntityFromResource = (resource: BatchResource): Batch =>
-    new Batch({
+  toEntityFromResource = (resource: ProductionBatchResource, orders: ProductionOrder[]): Batch => {
+    const order = orders.find(item => item.id === resource.productionOrderId);
+    const openIncidents = (resource.incidents ?? []).filter(incident => incident.status !== 'RESOLVED');
+    const events = resource.events ?? [];
+    const lastEvent = events[events.length - 1];
+    return new Batch({
       id: resource.id,
-      code: resource.code,
-      productCode: resource.productCode,
-      orderCode: resource.orderCode,
-      quantity: resource.quantity,
-      line: resource.line,
-      owner: resource.owner,
-      status: resource.status,
+      code: resource.batchNumber,
+      productCode: order?.productCode ?? '',
+      orderCode: order?.code ?? '',
+      quantity: Number(resource.plannedQuantityValue),
+      line: resource.line ?? '',
+      owner: resource.owner ?? '',
+      status: fromPlatformEnum(resource.status),
       progress: resource.progress,
-      incident: resource.incident,
-      lastActivity: resource.lastActivity,
-      lastActivityAt: resource.lastActivityAt
+      incident: openIncidents.length ? openIncidents[openIncidents.length - 1].description : '',
+      lastActivity: lastEvent ? this.eventAssembler.titleOf(lastEvent.type) : '',
+      lastActivityAt: lastEvent?.occurredAt ?? ''
     });
-
-  /**
-   * Converts a Batch entity to a BatchResource.
-   * @param entity - The entity to convert.
-   * @returns The converted BatchResource.
-   */
-  toResourceFromEntity = (entity: Batch): BatchResource =>
-    ({
-      id: entity.id,
-      code: entity.code,
-      productCode: entity.productCode,
-      orderCode: entity.orderCode,
-      quantity: entity.quantity,
-      line: entity.line,
-      owner: entity.owner,
-      status: entity.status,
-      progress: entity.progress,
-      incident: entity.incident,
-      lastActivity: entity.lastActivity,
-      lastActivityAt: entity.lastActivityAt
-    } as BatchResource);
+  };
 }
