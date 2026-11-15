@@ -1,9 +1,7 @@
 export const environment = {
   production: true,
-  // DoofPlus Platform (RESTful Web Services) published on Render: IAM (sign-in, sign-up, users), Organizations, IoT Monitoring, Manufacturing and Quality
+  // DoofPlus Platform (RESTful Web Services) published on Render: every bounded context
   platformProviderApiBaseUrl: 'https://doofplus-platform.onrender.com/api/v1',
-  // Fake API (json-server) published on Render for the resources not connected yet: IAM profiles and invitations and Subscriptions
-  fakeApiBaseUrl: 'https://ingescompany-frontend.onrender.com/api/v1',
   platformProviderQualityDocumentsEndpointPath: '/quality-documents',
   platformProviderDeviationsEndpointPath: '/deviations',
   platformProviderEvidenceEndpointPath: '/evidence',
@@ -25,11 +23,10 @@ export const environment = {
   platformProviderContactInquiriesEndpointPath: '/contact-inquiries',
   platformProviderPlansEndpointPath: '/plans',
   platformProviderSubscriptionsEndpointPath: '/subscriptions',
-  platformProviderInvoicesEndpointPath: '/invoices',
   platformProviderSignInEndpointPath: '/authentication/sign-in',
   platformProviderSignUpEndpointPath: '/authentication/sign-up',
   platformProviderUsersEndpointPath: '/users',
-  platformProviderRoleProfilesEndpointPath: '/role-profiles',
+  platformProviderRolesEndpointPath: '/roles',
   platformProviderInvitationsEndpointPath: '/invitations',
   platformProviderProductsEndpointPath: '/products',
   platformProviderMasterFormulasEndpointPath: '/master-formulas',

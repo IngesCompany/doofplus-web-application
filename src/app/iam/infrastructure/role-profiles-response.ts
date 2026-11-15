@@ -1,45 +1,25 @@
 import {BaseResource, BaseResponse} from '../../shared/infrastructure/base-response';
 
 /**
- * Resource representation of a role profile.
+ * Role of the DoofPlus Platform (GET /roles), for example ROLE_QA_SPECIALIST.
  */
 export interface RoleProfileResource extends BaseResource {
   /**
-   * Unique identifier of the role profile.
+   * Unique identifier of the role.
    */
   id: number;
   /**
-   * Role key referenced by users.
-   */
-  key: string;
-  /**
-   * Display name of the profile.
+   * Name of the role, for example ROLE_QA_SPECIALIST.
    */
   name: string;
-  /**
-   * Records the profile can create or edit.
-   */
-  createEdit: string[];
-  /**
-   * What the profile can approve or sign.
-   */
-  approveSign: string;
-  /**
-   * Main restriction of the profile.
-   */
-  restriction: string;
-  /**
-   * Color tone of the profile chip.
-   */
-  tone: string;
 }
 
 /**
- * Response envelope for role profile collection queries.
+ * Response envelope for role collection queries.
  */
 export interface RoleProfilesResponse extends BaseResponse {
   /**
-   * Array of role profile resources included in the response.
+   * Array of role resources included in the response.
    */
-  roleProfiles: RoleProfileResource[];
+  roles: RoleProfileResource[];
 }

@@ -1,6 +1,6 @@
 import {computed, inject, Injectable, signal} from '@angular/core';
 import {Router} from '@angular/router';
-import {map, Observable, of, retry} from 'rxjs';
+import {map, Observable, of} from 'rxjs';
 import {IamApi, SignInResult} from '../infrastructure/iam.api';
 import {TOKEN_KEY} from '../infrastructure/iam-token.interceptor';
 import {UserAssembler} from '../infrastructure/user-assembler';
@@ -202,7 +202,7 @@ export class IamStore {
       next: profiles => this.roleProfilesSignal.set(profiles),
       error: err => this.errorSignal.set(this.formatError(err, 'Failed to load profiles'))
     });
-    this.iamApi.getInvitations().subscribe({
+    this.iamApi.getInvitations(this.currentUser()?.organizationId ?? 0).subscribe({
       next: invitations => this.invitationsSignal.set(invitations),
       error: err => this.errorSignal.set(this.formatError(err, 'Failed to load invitations'))
     });
@@ -215,7 +215,8 @@ export class IamStore {
    */
   addInvitation = (invitation: Invitation, router: Router): void => {
     this.loadingSignal.set(true);
-    this.iamApi.createInvitation(invitation).pipe(retry(2)).subscribe({
+    invitation.organizationId = this.currentUser()?.organizationId ?? 0;
+    this.iamApi.createInvitation(invitation).subscribe({
       next: created => {
         this.invitationsSignal.update(invitations => [...invitations, created]);
         this.loadingSignal.set(false);

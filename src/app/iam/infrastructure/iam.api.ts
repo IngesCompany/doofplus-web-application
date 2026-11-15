@@ -11,6 +11,8 @@ import {RoleProfilesApiEndpoint} from './role-profiles-api-endpoint';
 import {InvitationsApiEndpoint} from './invitations-api-endpoint';
 import {AuthenticatedUserResource, UserResource} from './users-response';
 import {UserAssembler} from './user-assembler';
+import {InvitationResource} from './invitations-response';
+import {InvitationAssembler} from './invitation-assembler';
 
 /**
  * Outcome of a sign-in request to the DoofPlus Platform.
@@ -25,7 +27,7 @@ export type SignInResult =
 
 /**
  * Infrastructure facade for the IAM endpoints: authentication, users, profiles and invitations.
- * Sign-in, sign-up and users use the DoofPlus Platform; profiles and invitations still use the fake API.
+ * Everything uses the DoofPlus Platform: the role profiles come from its roles (GET /roles).
  */
 @Injectable({providedIn: 'root'})
 export class IamApi extends BaseApi {
@@ -36,6 +38,8 @@ export class IamApi extends BaseApi {
   private readonly signInUrl = `${environment.platformProviderApiBaseUrl}${environment.platformProviderSignInEndpointPath}`;
   private readonly signUpUrl = `${environment.platformProviderApiBaseUrl}${environment.platformProviderSignUpEndpointPath}`;
   private readonly userAssembler = new UserAssembler();
+  private readonly invitationAssembler = new InvitationAssembler();
+  private readonly invitationsUrl = `${environment.platformProviderApiBaseUrl}${environment.platformProviderInvitationsEndpointPath}`;
 
   /**
    * Signs in with the DoofPlus Platform.
@@ -86,10 +90,13 @@ export class IamApi extends BaseApi {
   getRoleProfiles = (): Observable<RoleProfile[]> => this.roleProfilesEndpoint.getAll();
 
   /**
-   * Retrieves the invitations.
+   * Retrieves the invitations sent by the administrators of an organization.
+   * @param organizationId - Identifier of the organization.
    * @returns Stream with the invitation collection.
    */
-  getInvitations = (): Observable<Invitation[]> => this.invitationsEndpoint.getAll();
+  getInvitations = (organizationId: number): Observable<Invitation[]> =>
+    this.http.get<InvitationResource[]>(this.invitationsUrl, {params: {organizationId}}).pipe(
+      map(resources => resources.map(resource => this.invitationAssembler.toEntityFromResource(resource))));
 
   /**
    * Creates a new invitation.

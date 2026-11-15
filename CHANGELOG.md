@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-11-15
+### Added
+- IAM: the invitations and the role profiles come from the DoofPlus Platform (`/invitations` of the organization of the administrator and `/roles`); the permission matrix of each role lives in `iam/domain/model/role-permissions.ts`.
+### Removed
+- The Fake API (`fakeApiBaseUrl`): every bounded context uses the DoofPlus Platform.
+
 ## [1.3.0] - 2026-11-15
 ### Added
 - IAM signs up and signs in with the DoofPlus Platform (JWT and two-factor code).
